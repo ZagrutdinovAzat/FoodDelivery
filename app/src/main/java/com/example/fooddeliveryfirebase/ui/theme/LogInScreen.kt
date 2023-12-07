@@ -32,12 +32,11 @@ import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
 import com.example.fooddeliveryfirebase.MainActivity
 import com.example.fooddeliveryfirebase.R
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    mAuth: FirebaseAuth,
+    db: DbHelper,
     mainActivity: MainActivity
 ) {
     var login by rememberSaveable {
@@ -80,11 +79,11 @@ fun LoginScreen(
                 if (login == "" || password == "") {
                     makeToast(context = context, text ="Fill in all the fields" )
                 } else {
-                    mAuth.signInWithEmailAndPassword(login, password)
+                     db.mAuth.signInWithEmailAndPassword(login, password)
                         .addOnCompleteListener(mainActivity) { task ->
                             if (task.isSuccessful) {
-                                val user = mAuth.currentUser
-                                if (user!!.isEmailVerified) {
+                                if (db.mAuth.currentUser!!.isEmailVerified) {
+                                    db.cUser = db.mAuth.currentUser
                                     makeToast(context, "Authentication successful.")
                                     navController.navigate(Marshroutes.route3)
                                 } else {
@@ -93,7 +92,6 @@ fun LoginScreen(
                             } else {
                                 makeToast(context = context, "Authentication failed.")
                             }
-
                         }
                 }
             },

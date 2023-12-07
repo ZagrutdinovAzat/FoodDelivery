@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 @Composable
-fun ConnectingScreen(navController: NavController, mAuth: FirebaseAuth) {
+fun ConnectingScreen(navController: NavController, db: DbHelper) {
     backGroundImage()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -28,12 +28,11 @@ fun ConnectingScreen(navController: NavController, mAuth: FirebaseAuth) {
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
-        val cUser: FirebaseUser? = mAuth.currentUser
-        val userEmail = cUser?.email
+        val userEmail = db.cUser?.email
         if (userEmail != null)
             Text(text = "You are logged in: $userEmail", color = Color.White)
 
-        logOutButton(mAuth = mAuth, navController = navController)
+        logOutButton(db = db, navController = navController)
 
         resumeButton(navController = navController)
 
@@ -43,10 +42,10 @@ fun ConnectingScreen(navController: NavController, mAuth: FirebaseAuth) {
 }
 
 @Composable
-fun logOutButton(mAuth: FirebaseAuth, navController: NavController) {
+fun logOutButton(db: DbHelper, navController: NavController) {
     Button(
         onClick = {
-            mAuth.signOut()
+            db.mAuth.signOut()
             navController.navigate(Marshroutes.route1)
         }, shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
@@ -55,7 +54,6 @@ fun logOutButton(mAuth: FirebaseAuth, navController: NavController) {
         modifier = Modifier
             .width(150.dp)
             .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(8.dp))
-            //.background(color = Color.Black)
     ) {
         Text(text = "log out", color = Color.White)
     }
@@ -90,7 +88,6 @@ fun forAdminButton(navController: NavController) {
         modifier = Modifier
             .width(150.dp)
             .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(8.dp))
-            //.background(color = Color.Black)
     ) {
         Text(text = "for admin", color = Color.White)
     }

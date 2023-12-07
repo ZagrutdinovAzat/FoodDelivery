@@ -26,7 +26,7 @@ import com.example.fooddeliveryfirebase.CustomTextField
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun RegistrationScreen(navController: NavController, mAuth: FirebaseAuth) {
+fun RegistrationScreen(navController: NavController, db: DbHelper) {
     var login by rememberSaveable {
         mutableStateOf("")
     }
@@ -54,7 +54,7 @@ fun RegistrationScreen(navController: NavController, mAuth: FirebaseAuth) {
             onValueChange = { password = it },
             label = "Password"
         )
-        RegisterButton(login, password, navController, mAuth)
+        RegisterButton(login, password, navController, db)
     }
 }
 
@@ -63,7 +63,7 @@ fun RegisterButton(
     login: String,
     password: String,
     navController: NavController,
-    mAuth: FirebaseAuth
+    db: DbHelper
 ) {
     val context = LocalContext.current
 
@@ -72,10 +72,10 @@ fun RegisterButton(
             if (login == "" || password == "") {
                 makeToast(context, "Fill in all the fields")
             } else {
-                mAuth.createUserWithEmailAndPassword(login, password)
+                db.mAuth.createUserWithEmailAndPassword(login, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            mAuth.currentUser?.sendEmailVerification()
+                            db.mAuth.currentUser?.sendEmailVerification()
                                 ?.addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         if (task.isSuccessful) {

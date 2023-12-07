@@ -52,29 +52,31 @@ import com.google.firebase.database.FirebaseDatabase
  import androidx.compose.ui.text.font.FontWeight
  import androidx.compose.ui.unit.dp
  import androidx.compose.ui.unit.sp
+import com.example.fooddeliveryfirebase.ui.theme.DbHelper
 
 class MainActivity : ComponentActivity() {
-    private var mAuth: FirebaseAuth = Firebase.auth
+//    private var mAuth: FirebaseAuth = Firebase.auth
+//
+//    private val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
+//
+//    private val cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
+//
+//    val mDatabase: DatabaseReference =
+//        FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
 
-    private val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
-
-    private val cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
-
-    val mDatabase: DatabaseReference =
-        FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
-
+    val db: DbHelper = DbHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val imgHandler = Img(contentResolver) // поиск изображения для menuscreen
 
-        if (cUser != null) {
+        if (db.cUser != null) {
             makeToast(this, "User not null")
-            userStatusLiveData.value = 1
+            db.userStatusLiveData.value = 1
         } else {
             makeToast(this, "User null")
-            userStatusLiveData.value = 0
+            db.userStatusLiveData.value = 0
         }
 
         setContent {
@@ -85,52 +87,26 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val start: String = if (userStatusLiveData.value == 1) {
+                    val start: String = if (db.userStatusLiveData.value == 1) {
                         Marshroutes.route3
                     } else {
                         Marshroutes.route1
                     }
-                    MyNavigation.MinimalNavigation(mAuth, this@MainActivity, start, imgHandler)
+                    MyNavigation.MinimalNavigation(db, this@MainActivity, start, imgHandler)
                 }
             }
         }
     }
 
-//    inner class Img(private val contentResolver: ContentResolver) {
-//        private val _myImg = MutableLiveData<String>()
-//        val myImg: LiveData<String> = _myImg
-//
-//        private val getContent: ActivityResultLauncher<String> =
-//            registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-//                if (uri != null) {
-//                    _myImg.value = uri.path.toString()
-//                    //println(uri.path.toString())
-//                    //println(myImg)
-//                } else {
-//                    _myImg.value = ""
-//                    //println("error")
-//                }
-//            }
-//        fun getImage() {
-//            getContent.launch("image/*")
-//            println(myImg.value)
-//        }
-//    }
-
-
     inner class Img(private val contentResolver: ContentResolver) {
-         val myImg = mutableStateOf("") //MutableLiveData<String>()
-        //val myImg: LiveData<String> = _myImg
+         val myImg = mutableStateOf("")
 
         private val getContent: ActivityResultLauncher<String> =
             registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
                 if (uri != null) {
                     myImg.value = uri.path.toString()
-                    //println(uri.path.toString())
-                    //println(myImg)
                 } else {
                     myImg.value = ""
-                    //println("error")
                 }
             }
         fun getImage() {

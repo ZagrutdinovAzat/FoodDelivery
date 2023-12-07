@@ -9,19 +9,19 @@ import com.google.firebase.auth.FirebaseAuth
 
 object MyNavigation {
     @Composable
-    fun MinimalNavigation(mAuth: FirebaseAuth, mainActivity: MainActivity, start: String, imgHandler: MainActivity.Img) {
+    fun MinimalNavigation(db: DbHelper, mainActivity: MainActivity, start: String, imgHandler: MainActivity.Img) {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = start)
         {
             composable(route = Marshroutes.route1) {
-                LoginScreen(navController = navController, mAuth, mainActivity)
+                LoginScreen(navController = navController, db, mainActivity)
             }
             composable(route = Marshroutes.route2) {
-                RegistrationScreen(navController = navController, mAuth)
+                RegistrationScreen(navController = navController, db)
             }
             composable(route = Marshroutes.route3)
             {
-                ConnectingScreen(navController = navController, mAuth)
+                ConnectingScreen(navController = navController, db)
             }
             composable(route = Marshroutes.route4)
             {
@@ -30,7 +30,7 @@ object MyNavigation {
 
             composable(route = Marshroutes.route5)
             {
-                ForAdminScreen(imgHandler, mAuth)
+                ForAdminScreen(imgHandler, db)
             }
         }
     }

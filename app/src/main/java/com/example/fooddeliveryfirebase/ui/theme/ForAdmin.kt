@@ -38,7 +38,7 @@ import com.google.firebase.database.FirebaseDatabase
 
 
 @Composable
-fun ForAdminScreen(imgHandler: MainActivity.Img, mAuth: FirebaseAuth) {
+fun ForAdminScreen(imgHandler: MainActivity.Img, db: DbHelper) {
     var name by rememberSaveable {
         mutableStateOf("")
     }
@@ -47,7 +47,6 @@ fun ForAdminScreen(imgHandler: MainActivity.Img, mAuth: FirebaseAuth) {
     }
 
     var price by rememberSaveable {
-        //mutableDoubleStateOf(0.0)
         mutableStateOf("")
     }
 
@@ -88,11 +87,7 @@ fun ForAdminScreen(imgHandler: MainActivity.Img, mAuth: FirebaseAuth) {
 
         Button(
             onClick = {
-                //val clickCount by
                 imgHandler.getImage()
-                //lunc
-                //Log.d("url", imgHandler.myImg.value.toString())
-
             }, shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.LightGray
@@ -101,6 +96,7 @@ fun ForAdminScreen(imgHandler: MainActivity.Img, mAuth: FirebaseAuth) {
         ) {
             Text(text = "choose image", color = Color.Black)
         }
+
 
         Button(
             onClick = {
