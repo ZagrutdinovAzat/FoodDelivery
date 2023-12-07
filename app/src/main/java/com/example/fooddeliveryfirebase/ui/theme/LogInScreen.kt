@@ -79,20 +79,7 @@ fun LoginScreen(
                 if (login == "" || password == "") {
                     makeToast(context = context, text ="Fill in all the fields" )
                 } else {
-                     db.mAuth.signInWithEmailAndPassword(login, password)
-                        .addOnCompleteListener(mainActivity) { task ->
-                            if (task.isSuccessful) {
-                                if (db.mAuth.currentUser!!.isEmailVerified) {
-                                    db.cUser = db.mAuth.currentUser
-                                    makeToast(context, "Authentication successful.")
-                                    navController.navigate(Marshroutes.route3)
-                                } else {
-                                    makeToast(context, "Confirm your email.")
-                                }
-                            } else {
-                                makeToast(context = context, "Authentication failed.")
-                            }
-                        }
+                    db.logIn(login, password, context, navController)
                 }
             },
             colors = ButtonDefaults.buttonColors(

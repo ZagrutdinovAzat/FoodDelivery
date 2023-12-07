@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
 //    val mDatabase: DatabaseReference =
 //        FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
 
-    val db: DbHelper = DbHelper()
+    private val db: DbHelper = DbHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
