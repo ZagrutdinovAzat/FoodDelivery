@@ -72,24 +72,7 @@ fun RegisterButton(
             if (login == "" || password == "") {
                 makeToast(context, "Fill in all the fields")
             } else {
-                db.mAuth.createUserWithEmailAndPassword(login, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            db.mAuth.currentUser?.sendEmailVerification()
-                                ?.addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        if (task.isSuccessful) {
-                                            makeToast(context = context, "Registration is successful, check your email for confirmation")
-                                            navController.navigate(Marshroutes.route1)
-                                        } else {
-                                            makeToast(context = context, "Registration failed: " + task.exception?.message)
-                                        }
-                                    }
-                                }
-                        } else {
-                            makeToast(context = context, "Registration failed: " + task.exception?.message)
-                        }
-                    }
+                db.registration(login, password, context, navController)
             }
         },
         colors = ButtonDefaults.buttonColors(

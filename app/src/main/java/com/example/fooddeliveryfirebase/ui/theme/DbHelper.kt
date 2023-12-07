@@ -16,13 +16,13 @@ import com.google.firebase.database.ValueEventListener
 
 class DbHelper {
 
-    var mAuth: FirebaseAuth = Firebase.auth
+     var mAuth: FirebaseAuth = Firebase.auth
 
     val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
 
-    var cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
+     var cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
 
-    val mDatabase: DatabaseReference =
+     val myMenu: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
 
     fun checkUser(context: Context) {
@@ -59,8 +59,8 @@ class DbHelper {
     }
 
     fun getMenuFromFirebase(listData: MutableList<Product>) {
-        val database: DatabaseReference = FirebaseDatabase.getInstance().getReference("Menu")
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
+        //val database: DatabaseReference = FirebaseDatabase.getInstance().getReference("Menu")
+        myMenu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ds in dataSnapshot.children) {
                     val name = ds.child("name").getValue(String::class.java)
@@ -79,10 +79,25 @@ class DbHelper {
         })
     }
 
-    fun registration()
+    fun registration(login: String, password: String, context: Context, navController: NavController)
     {
-
+        mAuth.createUserWithEmailAndPassword(login, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    mAuth.currentUser?.sendEmailVerification()
+                        ?.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                if (task.isSuccessful) {
+                                    makeToast(context = context, "Registration is successful, check your email for confirmation")
+                                    navController.navigate(Marshroutes.route1)
+                                } else {
+                                    makeToast(context = context, "Registration failed: " + task.exception?.message)
+                                }
+                            }
+                        }
+                } else {
+                    makeToast(context = context, "Registration failed: " + task.exception?.message)
+                }
+            }
     }
-
-
 }
