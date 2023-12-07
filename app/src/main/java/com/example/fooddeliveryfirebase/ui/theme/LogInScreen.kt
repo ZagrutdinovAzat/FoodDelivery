@@ -77,7 +77,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (login == "" || password == "") {
-                    makeToast(context = context, text ="Fill in all the fields" )
+                    makeToast(context = context, text = "Fill in all the fields")
                 } else {
                     db.logIn(login, password, context, navController)
                 }

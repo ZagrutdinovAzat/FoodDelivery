@@ -25,7 +25,7 @@ object MyNavigation {
             }
             composable(route = Marshroutes.route4)
             {
-                MenuScreen()
+                MenuScreen(db)
             }
 
             composable(route = Marshroutes.route5)

@@ -8,8 +8,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class DbHelper {
 
@@ -22,8 +25,17 @@ class DbHelper {
     val mDatabase: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
 
-    fun logIn(login: String, password: String, context: Context, navController: NavController)
-    {
+    fun checkUser(context: Context) {
+        if (cUser != null) {
+            makeToast(context = context, "User not null")
+            userStatusLiveData.value = 1
+        } else {
+            makeToast(context = context, "User null")
+            userStatusLiveData.value = 0
+        }
+    }
+
+    fun logIn(login: String, password: String, context: Context, navController: NavController) {
         mAuth.signInWithEmailAndPassword(login, password)
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
@@ -40,6 +52,37 @@ class DbHelper {
             }
     }
 
+
+    fun logOut(navController: NavController) {
+        mAuth.signOut()
+        navController.navigate(Marshroutes.route1)
+    }
+
+    fun getMenuFromFirebase(listData: MutableList<Product>) {
+        val database: DatabaseReference = FirebaseDatabase.getInstance().getReference("Menu")
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (ds in dataSnapshot.children) {
+                    val name = ds.child("name").getValue(String::class.java)
+                    val description = ds.child("description").getValue(String::class.java)
+                    val price = ds.child("price").getValue(Double::class.java)
+
+                    if (name != null && description != null && price != null) {
+                        listData.add(Product(name, description, price))
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок
+            }
+        })
+    }
+
+    fun registration()
+    {
+
+    }
 
 
 }

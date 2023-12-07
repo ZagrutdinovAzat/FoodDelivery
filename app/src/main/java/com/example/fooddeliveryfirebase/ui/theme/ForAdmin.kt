@@ -63,9 +63,7 @@ fun ForAdminScreen(imgHandler: MainActivity.Img, db: DbHelper) {
     )
     {
 
-
         CustomTextField(value = name, onValueChange = { name = it }, label = "name of dish")
-
 
         CustomTextField(
             value = description,

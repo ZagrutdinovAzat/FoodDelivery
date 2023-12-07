@@ -41,29 +41,20 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
- import androidx.activity.compose.setContent
- import androidx.compose.foundation.layout.padding
- import androidx.compose.foundation.lazy.LazyColumn
- import androidx.compose.foundation.lazy.items
- import androidx.compose.material3.Text
- import androidx.compose.runtime.mutableStateOf
- import androidx.compose.runtime.remember
- import androidx.compose.runtime.toMutableStateList
- import androidx.compose.ui.text.font.FontWeight
- import androidx.compose.ui.unit.dp
- import androidx.compose.ui.unit.sp
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.fooddeliveryfirebase.ui.theme.DbHelper
 
 class MainActivity : ComponentActivity() {
-//    private var mAuth: FirebaseAuth = Firebase.auth
-//
-//    private val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
-//
-//    private val cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
-//
-//    val mDatabase: DatabaseReference =
-//        FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
-
     private val db: DbHelper = DbHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,17 +62,9 @@ class MainActivity : ComponentActivity() {
 
         val imgHandler = Img(contentResolver) // поиск изображения для menuscreen
 
-        if (db.cUser != null) {
-            makeToast(this, "User not null")
-            db.userStatusLiveData.value = 1
-        } else {
-            makeToast(this, "User null")
-            db.userStatusLiveData.value = 0
-        }
+        db.checkUser(this)
 
         setContent {
-
-
             FoodDeliveryFireBaseTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -99,7 +82,7 @@ class MainActivity : ComponentActivity() {
     }
 
     inner class Img(private val contentResolver: ContentResolver) {
-         val myImg = mutableStateOf("")
+        val myImg = mutableStateOf("")
 
         private val getContent: ActivityResultLauncher<String> =
             registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -109,13 +92,12 @@ class MainActivity : ComponentActivity() {
                     myImg.value = ""
                 }
             }
+
         fun getImage() {
             getContent.launch("image/*")
-            //println(myImg.value)
         }
     }
 }
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

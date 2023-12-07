@@ -33,69 +33,54 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 @Composable
-fun MenuScreen() {
+fun MenuScreen(db: DbHelper) {
     val listData = remember { mutableStateListOf<Product>() }
 
-    fun getMenuFromFirebase(listData: MutableList<Product>) {
-        val database: DatabaseReference = FirebaseDatabase.getInstance().getReference("Menu")
-        database.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (ds in dataSnapshot.children) {
-                    val name = ds.child("name").getValue(String::class.java)
-                    val description = ds.child("description").getValue(String::class.java)
-                    val price = ds.child("price").getValue(Double::class.java)
-
-                    if (name != null && description != null && price != null) {
-                        listData.add(Product(name, description, price))
-                    }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибок
-            }
-        })
-    }
-
     LaunchedEffect(Unit) {
-        getMenuFromFirebase(listData)
+        db.getMenuFromFirebase(listData)
     }
 
-//    LaunchedEffect(Unit)
-//    {
-//        fun qwr()
-//        {
-//            println("125456")
-//        }
-//    }
     backGroundImage()
     Column {
-        Text(text = "MENU", fontSize = 25.sp, fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic, textAlign = TextAlign.Center, modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Color.Transparent
-            ), color = Color.White)
+        Text(
+            text = "MENU",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Color.Transparent
+                ),
+            color = Color.White
+        )
         LazyMenu(listData = listData)
     }
 }
 
 
 @Composable
-fun LazyMenu(listData: List<Product>)
-{
+fun LazyMenu(listData: List<Product>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent),
         contentPadding = PaddingValues(16.dp) // добавим небольшой отступ вокруг элементов
     ) {
-        itemsIndexed(listData) {_, menuItem ->
+        itemsIndexed(listData) { _, menuItem ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp) // добавим пространства между элементами
             ) {
-                Card(modifier = Modifier.border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(8.dp))) {
+                Card(
+                    modifier = Modifier.border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                ) {
                     Text(
                         text = menuItem.name,
                         style = TextStyle(

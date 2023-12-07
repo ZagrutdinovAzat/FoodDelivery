@@ -45,8 +45,7 @@ fun ConnectingScreen(navController: NavController, db: DbHelper) {
 fun logOutButton(db: DbHelper, navController: NavController) {
     Button(
         onClick = {
-            db.mAuth.signOut()
-            navController.navigate(Marshroutes.route1)
+            db.logOut(navController)
         }, shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent,
