@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "381567314335",
+    "firebase_url": "https://fooddeliverydatabase-76c3e-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "fooddeliverydatabase-76c3e",
+    "storage_bucket": "fooddeliverydatabase-76c3e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381567314335:android:b085708dc7f6bfdfe775aa",
+        "android_client_info": {
+          "package_name": "com.example.fooddeliveryfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVqpFkgwGDyNRvzTSrztaOXcp5CloHuLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
