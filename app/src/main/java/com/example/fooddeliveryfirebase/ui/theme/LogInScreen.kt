@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,14 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
-import com.example.fooddeliveryfirebase.MainActivity
 import com.example.fooddeliveryfirebase.R
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     db: DbHelper,
-    mainActivity: MainActivity
 ) {
     var login by rememberSaveable {
         mutableStateOf("")
@@ -48,7 +45,7 @@ fun LoginScreen(
     val context = LocalContext.current
 
 
-    backGroundImage()
+    BackGroundImage()
 
     Image(
         painter = painterResource(id = R.drawable.loho),
@@ -91,8 +88,11 @@ fun LoginScreen(
         ) {
             Text(text = "log in", color = Color.White)
         }
+
         Button(
             onClick = {
+                login = ""
+                password = ""
                 navController.navigate(Marshroutes.route2)
             },
             colors = ButtonDefaults.buttonColors(
@@ -116,7 +116,7 @@ fun makeToast(context: Context, text: String) {
 }
 
 @Composable
-fun backGroundImage() {
+fun BackGroundImage() {
     Image(
         painter = painterResource(id = R.drawable.bg3),
         contentDescription = null,

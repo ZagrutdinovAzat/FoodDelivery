@@ -5,16 +5,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fooddeliveryfirebase.MainActivity
-import com.google.firebase.auth.FirebaseAuth
 
 object MyNavigation {
     @Composable
-    fun MinimalNavigation(db: DbHelper, mainActivity: MainActivity, start: String, imgHandler: MainActivity.Img) {
+    fun MinimalNavigation(db: DbHelper, start: String, imgHandler: MainActivity.Img) {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = start)
         {
             composable(route = Marshroutes.route1) {
-                LoginScreen(navController = navController, db, mainActivity)
+                LoginScreen(navController = navController, db)
             }
             composable(route = Marshroutes.route2) {
                 RegistrationScreen(navController = navController, db)

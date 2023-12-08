@@ -1,6 +1,5 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,12 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun ConnectingScreen(navController: NavController, db: DbHelper) {
-    backGroundImage()
+    BackGroundImage()
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -32,17 +29,17 @@ fun ConnectingScreen(navController: NavController, db: DbHelper) {
         if (userEmail != null)
             Text(text = "You are logged in: $userEmail", color = Color.White)
 
-        logOutButton(db = db, navController = navController)
+        LogOutButton(db = db, navController = navController)
 
-        resumeButton(navController = navController)
+        ResumeButton(navController = navController)
 
-        forAdminButton(navController = navController)
+        ForAdminButton(navController = navController)
 
     }
 }
 
 @Composable
-fun logOutButton(db: DbHelper, navController: NavController) {
+fun LogOutButton(db: DbHelper, navController: NavController) {
     Button(
         onClick = {
             db.logOut(navController)
@@ -59,7 +56,7 @@ fun logOutButton(db: DbHelper, navController: NavController) {
 }
 
 @Composable
-fun resumeButton(navController: NavController) {
+fun ResumeButton(navController: NavController) {
     Button(
         onClick = {
             navController.navigate(Marshroutes.route4)
@@ -76,7 +73,7 @@ fun resumeButton(navController: NavController) {
 }
 
 @Composable
-fun forAdminButton(navController: NavController) {
+fun ForAdminButton(navController: NavController) {
     Button(
         onClick = {
             navController.navigate(Marshroutes.route5)

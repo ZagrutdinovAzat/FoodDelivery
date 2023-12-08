@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun RegistrationScreen(navController: NavController, db: DbHelper) {
@@ -34,7 +33,7 @@ fun RegistrationScreen(navController: NavController, db: DbHelper) {
         mutableStateOf("")
     }
 
-    backGroundImage()
+    BackGroundImage()
 
     Column(
         modifier = Modifier.fillMaxSize(),

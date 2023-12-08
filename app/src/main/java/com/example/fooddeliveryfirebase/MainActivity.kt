@@ -1,11 +1,8 @@
 package com.example.fooddeliveryfirebase
 
-import android.content.ContentResolver
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,39 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.fooddeliveryfirebase.ui.theme.FoodDeliveryFireBaseTheme
 import com.example.fooddeliveryfirebase.ui.theme.Marshroutes
 import com.example.fooddeliveryfirebase.ui.theme.MyNavigation
-import com.example.fooddeliveryfirebase.ui.theme.makeToast
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.fooddeliveryfirebase.ui.theme.DbHelper
 
 class MainActivity : ComponentActivity() {
@@ -60,7 +34,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val imgHandler = Img(contentResolver) // поиск изображения для menuscreen
+        val imgHandler = Img() // поиск изображения для menuscreen
 
         db.checkUser(this)
 
@@ -75,13 +49,13 @@ class MainActivity : ComponentActivity() {
                     } else {
                         Marshroutes.route1
                     }
-                    MyNavigation.MinimalNavigation(db, this@MainActivity, start, imgHandler)
+                    MyNavigation.MinimalNavigation(db, start, imgHandler)
                 }
             }
         }
     }
 
-    inner class Img(private val contentResolver: ContentResolver) {
+    inner class Img {
         val myImg = mutableStateOf("")
 
         private val getContent: ActivityResultLauncher<String> =

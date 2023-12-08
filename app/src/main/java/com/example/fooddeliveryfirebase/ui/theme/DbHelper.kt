@@ -3,7 +3,6 @@ package com.example.fooddeliveryfirebase.ui.theme
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
-import com.example.fooddeliveryfirebase.MainActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -16,14 +15,18 @@ import com.google.firebase.database.ValueEventListener
 
 class DbHelper {
 
-     var mAuth: FirebaseAuth = Firebase.auth
+    private var mAuth: FirebaseAuth = Firebase.auth
 
     val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
 
-     var cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
+    var cUser: FirebaseUser? = mAuth.currentUser // пользователь который сейчас авторизован
 
-     val myMenu: DatabaseReference =
+    private val myMenu: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
+
+    val myBasket: DatabaseReference =
+        FirebaseDatabase.getInstance().getReference("Basket") // подключение к корзине
+
 
     fun checkUser(context: Context) {
         if (cUser != null) {
@@ -37,7 +40,7 @@ class DbHelper {
 
     fun logIn(login: String, password: String, context: Context, navController: NavController) {
         mAuth.signInWithEmailAndPassword(login, password)
-            .addOnCompleteListener() { task ->
+            .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     if (mAuth.currentUser!!.isEmailVerified) {
                         cUser = mAuth.currentUser
@@ -59,7 +62,6 @@ class DbHelper {
     }
 
     fun getMenuFromFirebase(listData: MutableList<Product>) {
-        //val database: DatabaseReference = FirebaseDatabase.getInstance().getReference("Menu")
         myMenu.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 for (ds in dataSnapshot.children) {
@@ -79,8 +81,12 @@ class DbHelper {
         })
     }
 
-    fun registration(login: String, password: String, context: Context, navController: NavController)
-    {
+    fun registration(
+        login: String,
+        password: String,
+        context: Context,
+        navController: NavController
+    ) {
         mAuth.createUserWithEmailAndPassword(login, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -88,10 +94,16 @@ class DbHelper {
                         ?.addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 if (task.isSuccessful) {
-                                    makeToast(context = context, "Registration is successful, check your email for confirmation")
+                                    makeToast(
+                                        context = context,
+                                        "Registration is successful, check your email for confirmation"
+                                    )
                                     navController.navigate(Marshroutes.route1)
                                 } else {
-                                    makeToast(context = context, "Registration failed: " + task.exception?.message)
+                                    makeToast(
+                                        context = context,
+                                        "Registration failed: " + task.exception?.message
+                                    )
                                 }
                             }
                         }
@@ -99,5 +111,31 @@ class DbHelper {
                     makeToast(context = context, "Registration failed: " + task.exception?.message)
                 }
             }
+    }
+
+    fun addDishInFirebase(name: String, description: String, price: String, context: Context) {
+        if (name == "" || description == "" || price.toDoubleOrNull() == null) {
+            makeToast(context = context, "Fill all fields")
+        } else {
+            val dish = Product(name, description, price.toDouble())
+            myMenu.child(name).setValue(dish)
+        }
+    }
+
+    fun addInBasket(menuItem: Product, c: Int) {
+        myBasket.child(cUser!!.uid).child(menuItem.name)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val currentValue = dataSnapshot.getValue(Int::class.java) ?: 0
+                    if (!(c == -1 && currentValue == 0)) {
+                        val newValue = currentValue + c
+                        myBasket.child(cUser!!.uid).child(menuItem.name).setValue(newValue)
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Обработка ошибок
+                }
+            })
     }
 }
