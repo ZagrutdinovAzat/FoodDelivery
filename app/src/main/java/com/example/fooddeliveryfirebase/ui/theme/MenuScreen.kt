@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -55,7 +56,7 @@ import com.google.firebase.database.ktx.values
 import com.google.firebase.database.values
 
 @Composable
-fun MenuScreen(db: DbHelper) {
+fun MenuScreen(db: DbHelper, navController: NavController) {
     val listData = remember { mutableStateListOf<Product>() }
 
     LaunchedEffect(Unit) {
@@ -77,6 +78,9 @@ fun MenuScreen(db: DbHelper) {
                 ),
             color = Color.White
         )
+        Button(onClick = {navController.navigate(Marshroutes.route6)}) {
+            Text("Basket", color = Color.White)
+        }
         LazyMenu(listData = listData, db = db)
     }
 }
@@ -88,7 +92,7 @@ fun LazyMenu(listData: List<Product>, db: DbHelper) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(16.dp),
     ) {
         itemsIndexed(listData) { _, menuItem ->
             Column(
@@ -103,24 +107,6 @@ fun LazyMenu(listData: List<Product>, db: DbHelper) {
                             color = Color.White,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .clickable {/* menuItem.count.intValue++*/
-//                            val myBasket: DatabaseReference =
-//                                FirebaseDatabase.getInstance().getReference("Basket")
-//                           //myBasket.child(db.cUser!!.uid).child(menuItem.name).setValue(++1)
-//                            myBasket.child(db.cUser!!.uid).child(menuItem.name)
-//                                .addListenerForSingleValueEvent(object : ValueEventListener {
-//                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                                        val currentValue = dataSnapshot.getValue(Int::class.java) ?: 0
-//                                        val newValue = currentValue + 1
-//                                        // Теперь обновляем значение в базе данных
-//                                        myBasket.child(db.cUser!!.uid).child(menuItem.name).setValue(newValue)
-//                                    }
-//
-//                                    override fun onCancelled(databaseError: DatabaseError) {
-//                                        // Обработка ошибок
-//                                    }
-//                                })
-                        }
                 ) {
                     Column {
 

@@ -24,12 +24,16 @@ object MyNavigation {
             }
             composable(route = Marshroutes.route4)
             {
-                MenuScreen(db)
+                MenuScreen(db, navController)
             }
 
             composable(route = Marshroutes.route5)
             {
                 ForAdminScreen(imgHandler, db)
+            }
+            composable(route = Marshroutes.route6)
+            {
+                BasketScreen(db = db)
             }
         }
     }
@@ -41,4 +45,5 @@ object Marshroutes {
     const val route3 = "Profile"
     const val route4 = "Menu"
     const val route5 = "ForAdmin"
+    const val route6 = "Basket"
 }
