@@ -7,5 +7,6 @@ import androidx.compose.runtime.remember
 class Product(
     val name: String,
     val description: String,
-    val price: Double
+    val price: Double,
+    var cValue: Int? = null
 )

@@ -124,15 +124,15 @@ fun LazyMenu(listData: List<Product>, db: DbHelper) {
                                 horizontalArrangement = Arrangement.End,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                AddRemoveButtons(icon = Icons.Sharp.Delete, db, menuItem.name, menuItem.price, -1)
+                                AddRemoveButtons(icon = Icons.Sharp.Delete, db, menuItem.name, menuItem.price, menuItem.description, -1)
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    "0", /* Текущее количество товаров */
+                                    text = menuItem.cValue.toString(), /* Текущее количество товаров */
                                     color = Color.White,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                AddRemoveButtons(icon = Icons.Sharp.Add, db, menuItem.name, menuItem.price, 1)
+                                AddRemoveButtons(icon = Icons.Sharp.Add, db, menuItem.name, menuItem.price, menuItem.description,1)
                             }
                         }
                     }
@@ -143,9 +143,9 @@ fun LazyMenu(listData: List<Product>, db: DbHelper) {
 }
 
 @Composable
-fun AddRemoveButtons(icon: ImageVector, db: DbHelper, /*menuItem: Product*/name: String, price: Double?, c: Int) {
+fun AddRemoveButtons(icon: ImageVector, db: DbHelper, /*menuItem: Product*/name: String, price: Double?, description: String?, c: Int) {
     IconButton(
-        onClick = { db.addInBasket(name, price, c) },
+        onClick = { db.addInBasket(name, price,description, c) },
         modifier = Modifier
             .size(50.dp)
             .border(

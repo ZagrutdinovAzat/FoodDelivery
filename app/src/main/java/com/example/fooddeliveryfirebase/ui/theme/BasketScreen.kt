@@ -44,14 +44,14 @@ fun BasketScreen(navController: NavController, db: DbHelper) {
 }
 
 
-data class BasketItem(val key: String, var cValue: Int, var price: Double)
+data class BasketItem(val key: String, var cValue: Int, var price: Double, var description: String?)
 
 @Composable
 fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
     BackGroundImage()
     Column {
         Text(
-            text = "MENU",
+            text = "CART",
             fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             fontStyle = FontStyle.Italic,
@@ -93,7 +93,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                 ) {
                     Column {
                         Text(
-                            text = menuItem.key.toString(),
+                            text = menuItem.key,
                             style = TextStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
@@ -101,8 +101,17 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                             color = Color.White,
                             modifier = Modifier.padding(start = 8.dp),
                         )
+//                        Text(
+//                            text = menuItem.cValue.toString(),
+//                            style = TextStyle(
+//                                fontSize = 14.sp
+//                            ),
+//                            color = Color.Gray,
+//                            modifier = Modifier.padding(start = 8.dp)
+//                        )
+
                         Text(
-                            text = menuItem.cValue.toString(),
+                            text = menuItem.description.toString(),
                             style = TextStyle(
                                 fontSize = 14.sp
                             ),
@@ -124,11 +133,12 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                     db,
                                     menuItem.key.toString(),
                                     null,
+                                    null,
                                     -1
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    "0", /* Текущее количество товаров */
+                                    text = menuItem.cValue.toString(), /* Текущее количество товаров */
                                     color = Color.White,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
@@ -137,6 +147,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                     icon = Icons.Sharp.Add,
                                     db,
                                     menuItem.key,
+                                    null,
                                     null,
                                     1
                                 )

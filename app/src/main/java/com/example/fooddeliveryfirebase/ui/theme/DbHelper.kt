@@ -2,7 +2,6 @@ package com.example.fooddeliveryfirebase.ui.theme
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
@@ -64,6 +63,7 @@ class DbHelper {
     }
 
     fun getMenuFromFirebase(listData: MutableList<Product>) {
+        // Получаем данные из меню
         myMenu.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val products = mutableListOf<Product>()
@@ -73,9 +73,23 @@ class DbHelper {
                     val price = ds.child("price").getValue(Double::class.java)
 
                     if (name != null && description != null && price != null) {
-                        products.add(Product(name, description, price))
+                        val product = Product(name = name, description = description, price = price)
+                        products.add(product)
+
+                        // Получаем данные из корзины для данного продукта и обновляем cValue
+                        myBasket.child(cUser!!.uid).child(ds.key!!).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(basketDataSnapshot: DataSnapshot) {
+                                product.cValue =
+                                    basketDataSnapshot.child("count").getValue(Int::class.java) ?: 0
+                            }
+
+                            override fun onCancelled(basketDatabaseError: DatabaseError) {
+                                // Обработка ошибок при чтении корзины
+                            }
+                        })
                     }
                 }
+
                 listData.clear()
                 listData.addAll(products)
             }
@@ -122,12 +136,12 @@ class DbHelper {
         if (name == "" || description == "" || price.toDoubleOrNull() == null) {
             makeToast(context = context, "Fill all fields")
         } else {
-            val dish = Product(name, description, price.toDouble())
+            val dish = Product(name = name, description = description, price = price.toDouble())
             myMenu.child(name).setValue(dish)
         }
     }
 
-    fun addInBasket(name: String, price: Double?, c: Int) {
+    fun addInBasket(name: String, price: Double?, description: String?, c: Int) {
         val basketRef = myBasket.child(cUser!!.uid).child(name)
         basketRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -140,6 +154,9 @@ class DbHelper {
                     basketRef.child("count").setValue(newCount)
                     if (price != null)
                         basketRef.child("price").setValue(price)
+                    if (description != null) {
+                        basketRef.child("description").setValue(description)
+                    }
                 }
             }
 
@@ -158,7 +175,9 @@ class DbHelper {
                     val idDish = dishSnapshot.key ?: ""
                     val count = dishSnapshot.child("count").getValue(Int::class.java) ?: 0
                     val price = dishSnapshot.child("price").getValue(Double::class.java) ?: 0.0
-                    items.add(BasketItem(idDish, count, price))
+                    val description =
+                        dishSnapshot.child("description").getValue(String()::class.java) ?: ""
+                    items.add(BasketItem(idDish, count, price, description))
                 }
                 listData.value = items
             }
@@ -168,4 +187,5 @@ class DbHelper {
             }
         })
     }
+
 }
