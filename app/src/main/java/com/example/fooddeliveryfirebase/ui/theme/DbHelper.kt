@@ -7,7 +7,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -126,45 +125,50 @@ class DbHelper {
         }
     }
 
-    fun addInBasket(menuItem: Product, c: Int) {
-        myBasket.child(cUser!!.uid).child(menuItem.name)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val currentValue = dataSnapshot.getValue(Int::class.java) ?: 0
-                    if (c == -1 && currentValue == 1) {
-                        myBasket.child(cUser!!.uid).child(menuItem.name).removeValue()
-                    } else if (c == -1 && currentValue == 0) {
-                    } else {
-                        val newValue = currentValue + c
-                        myBasket.child(cUser!!.uid).child(menuItem.name).setValue(newValue)
-                    }
+    fun addInBasket(name: String, price: Double?, c: Int, listData: MutableList<BasketItem>? = null) {
+        val basketRef = myBasket.child(cUser!!.uid).child(name)
+        basketRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val currentCount = dataSnapshot.child("count").getValue(Int::class.java) ?: 0
+
+                val newCount = currentCount + c
+                if (newCount <= 0) {
+                    basketRef.removeValue()
+                    listData?.removeAll { it.key == name }
+                    if(listData != null){}
+                } else {
+                    basketRef.child("count").setValue(newCount)
+                    if (price != null)
+                        basketRef.child("price").setValue(price * newCount)
                 }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Обработка ошибок
-                }
-            })
-    }
-
-    fun getBasketFromFirebase(listData: MutableList<BasketItem>) {
-        myBasket.child(cUser!!.uid).addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                listData.add(BasketItem(dataSnapshot.key.toString(), dataSnapshot.value.toString()))
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                listData[listData.indexOfFirst { it.key == dataSnapshot.key }] =
-                    BasketItem(dataSnapshot.key.toString(), dataSnapshot.value.toString())
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                listData.removeAt(listData.indexOfFirst { it.key == dataSnapshot.key })
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок
+            }
+        })
+    }
+
+    fun getBasketFromFirebase(listData: MutableList<BasketItem>) {
+        myBasket.child(cUser!!.uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                dataSnapshot.children.forEach { dishSnapshot ->
+                    val idDish = dishSnapshot.key
+                    val count = dishSnapshot.child("count").getValue(Int::class.java)
+                    val price = dishSnapshot.child("price").getValue(Double::class.java)
+
+                    val existingItem = listData.firstOrNull { it.key == idDish }
+                    if (existingItem != null) {
+                        existingItem.cValue = count
+                        existingItem.price = price
+                    } else {
+                        listData.add(BasketItem(idDish, count, price))
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок
             }
         })
     }

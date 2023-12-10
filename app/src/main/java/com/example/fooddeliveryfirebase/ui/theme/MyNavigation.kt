@@ -33,7 +33,7 @@ object MyNavigation {
             }
             composable(route = Marshroutes.route6)
             {
-                BasketScreen(db = db)
+                BasketScreen(navController = navController,db = db)
             }
         }
     }

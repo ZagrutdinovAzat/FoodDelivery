@@ -8,7 +8,4 @@ class Product(
     val name: String,
     val description: String,
     val price: Double
-) {
-//    var count: MutableIntState =
-//        mutableIntStateOf(0)
-}
+)

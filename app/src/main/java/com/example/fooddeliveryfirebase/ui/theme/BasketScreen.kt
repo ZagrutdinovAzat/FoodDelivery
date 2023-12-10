@@ -26,19 +26,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import androidx.navigation.NavController
 
 @Composable
-fun BasketScreen(db: DbHelper) {
+fun BasketScreen(navController: NavController,db: DbHelper) {
     val listData = remember { mutableStateListOf<BasketItem>() }
 //    val myBasketRef: DatabaseReference =
 //        FirebaseDatabase.getInstance().getReference("Basket").child(db.cUser!!.uid)
@@ -80,22 +76,46 @@ fun BasketScreen(db: DbHelper) {
 //        }
 //    })
     db.getBasketFromFirebase(listData)
+    BottomBar(navController = navController, function = { MyBasket(listData = listData, db = db) })
+    //LazyBasket(listData = listData, db = db)
 
 
-    Basket(listData = listData)
+    //Basket(listData = listData)
     //BasketScreen(db = db)
 }
 
 
-class BasketItem(val key: String, val cValue: String)
+class BasketItem(val key: String?, var cValue: Int?, var price: Double? = 0.0)
 
 @Composable
-fun Basket(listData: List<BasketItem>)
-{
+fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
+    BackGroundImage()
+    Column {
+        Text(
+            text = "MENU",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Color.Transparent
+                ),
+            color = Color.White
+        )
+        LazyBasket(listData = listData, db = db)
+
+    }
+}
+
+@Composable
+fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Transparent),
+            .background(Color.Transparent)
+            .padding(bottom = 30.dp),
         contentPadding = PaddingValues(16.dp),
     ) {
         itemsIndexed(listData) { _, menuItem ->
@@ -112,11 +132,46 @@ fun Basket(listData: List<BasketItem>)
                             shape = RoundedCornerShape(8.dp)
                         )
                 ) {
-                    Row()
-                    {
-                        Text(text = menuItem.key + " " + menuItem.cValue)
-                    }
+                    Column {
+                        Text(
+                            text = menuItem.key.toString(),
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            ),
+                            color = Color.White,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                        Text(
+                            text = menuItem.cValue.toString(),
+                            style = TextStyle(
+                                fontSize = 14.sp
+                            ),
+                            color = Color.Gray,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
 
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                AddRemoveButtons(icon = Icons.Sharp.Delete, db, menuItem.key.toString(), null, -1)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    "0", /* Текущее количество товаров */
+                                    color = Color.White,
+                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                AddRemoveButtons(icon = Icons.Sharp.Add, db,menuItem.key.toString(),  null, 1)
+                            }
+                        }
+                    }
                 }
             }
         }
