@@ -1,6 +1,8 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
@@ -125,7 +127,7 @@ class DbHelper {
         }
     }
 
-    fun addInBasket(name: String, price: Double?, c: Int, listData: MutableList<BasketItem>? = null) {
+    fun addInBasket(name: String, price: Double?, c: Int) {
         val basketRef = myBasket.child(cUser!!.uid).child(name)
         basketRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -134,12 +136,10 @@ class DbHelper {
                 val newCount = currentCount + c
                 if (newCount <= 0) {
                     basketRef.removeValue()
-                    listData?.removeAll { it.key == name }
-                    if(listData != null){}
                 } else {
                     basketRef.child("count").setValue(newCount)
                     if (price != null)
-                        basketRef.child("price").setValue(price * newCount)
+                        basketRef.child("price").setValue(price)
                 }
             }
 
@@ -149,22 +149,18 @@ class DbHelper {
         })
     }
 
-    fun getBasketFromFirebase(listData: MutableList<BasketItem>) {
-        myBasket.child(cUser!!.uid).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                dataSnapshot.children.forEach { dishSnapshot ->
-                    val idDish = dishSnapshot.key
-                    val count = dishSnapshot.child("count").getValue(Int::class.java)
-                    val price = dishSnapshot.child("price").getValue(Double::class.java)
 
-                    val existingItem = listData.firstOrNull { it.key == idDish }
-                    if (existingItem != null) {
-                        existingItem.cValue = count
-                        existingItem.price = price
-                    } else {
-                        listData.add(BasketItem(idDish, count, price))
-                    }
+    fun getBasketFromFirebase(listData: MutableState<List<BasketItem>>) {
+        myBasket.child(cUser!!.uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val items = mutableListOf<BasketItem>()
+                dataSnapshot.children.forEach { dishSnapshot ->
+                    val idDish = dishSnapshot.key ?: ""
+                    val count = dishSnapshot.child("count").getValue(Int::class.java) ?: 0
+                    val price = dishSnapshot.child("price").getValue(Double::class.java) ?: 0.0
+                    items.add(BasketItem(idDish, count, price))
                 }
+                listData.value = items
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

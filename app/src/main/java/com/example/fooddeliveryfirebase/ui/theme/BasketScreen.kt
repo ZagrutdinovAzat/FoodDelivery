@@ -20,7 +20,9 @@ import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,58 +36,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun BasketScreen(navController: NavController,db: DbHelper) {
-    val listData = remember { mutableStateListOf<BasketItem>() }
-//    val myBasketRef: DatabaseReference =
-//        FirebaseDatabase.getInstance().getReference("Basket").child(db.cUser!!.uid)
-//
-//    myBasketRef.addChildEventListener(object : ChildEventListener {
-//        override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
-//            // Получаем ключ и значение и делаем с ними что-то
-//            val key = dataSnapshot.key
-//            val value = dataSnapshot.value
-//
-//            listData.add(BasketItem(key.toString(), value.toString()))
-//            // Делайте что-то с полученным ключом и значением
-//        }
-//
-//        override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-//            // Метод вызывается при изменении значения дочернего элемента
-//
-//            val key = dataSnapshot.key
-//
-//            val itemIndex = listData.indexOfFirst { it.key == key } // Найти индекс элемента с определенным ключом
-//            if (itemIndex != -1) { // Если элемент найден
-//                listData[itemIndex] = BasketItem(dataSnapshot.key.toString(), dataSnapshot.value.toString())
-//            }
-//        }
-//
-//        override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-//            // Метод вызывается при удалении дочернего элемента
-//            val key = dataSnapshot.key
-//            val itemIndex = listData.indexOfFirst { it.key == key }
-//            listData.removeAt(itemIndex)
-//        }
-//
-//        override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-//            // Метод вызывается при перемещении дочернего элемента
-//        }
-//
-//        override fun onCancelled(databaseError: DatabaseError) {
-//            // Обработка ошибок
-//        }
-//    })
+fun BasketScreen(navController: NavController, db: DbHelper) {
+    val listData = remember { mutableStateOf(emptyList<BasketItem>()) }
     db.getBasketFromFirebase(listData)
-    BottomBar(navController = navController, function = { MyBasket(listData = listData, db = db) })
-    //LazyBasket(listData = listData, db = db)
 
-
-    //Basket(listData = listData)
-    //BasketScreen(db = db)
+    BottomBar(navController = navController, function = { MyBasket(listData = listData.value, db = db) })
 }
 
 
-class BasketItem(val key: String?, var cValue: Int?, var price: Double? = 0.0)
+data class BasketItem(val key: String, var cValue: Int, var price: Double)
 
 @Composable
 fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
@@ -160,7 +119,13 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                 horizontalArrangement = Arrangement.End,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                AddRemoveButtons(icon = Icons.Sharp.Delete, db, menuItem.key.toString(), null, -1)
+                                AddRemoveButtons(
+                                    icon = Icons.Sharp.Delete,
+                                    db,
+                                    menuItem.key.toString(),
+                                    null,
+                                    -1
+                                )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     "0", /* Текущее количество товаров */
@@ -168,7 +133,13 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                AddRemoveButtons(icon = Icons.Sharp.Add, db,menuItem.key.toString(),  null, 1)
+                                AddRemoveButtons(
+                                    icon = Icons.Sharp.Add,
+                                    db,
+                                    menuItem.key,
+                                    null,
+                                    1
+                                )
                             }
                         }
                     }
