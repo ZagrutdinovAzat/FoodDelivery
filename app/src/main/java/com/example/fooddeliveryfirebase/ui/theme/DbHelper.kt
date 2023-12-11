@@ -62,8 +62,7 @@ class DbHelper {
         navController.navigate(Marshroutes.route1)
     }
 
-    fun getMenuFromFirebase(listData: MutableList<Product>) {
-        // Получаем данные из меню
+    fun getMenuFromFirebase(listData: MutableState<List<Product>>) {
         myMenu.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val products = mutableListOf<Product>()
@@ -75,23 +74,9 @@ class DbHelper {
                     if (name != null && description != null && price != null) {
                         val product = Product(name = name, description = description, price = price)
                         products.add(product)
-
-                        // Получаем данные из корзины для данного продукта и обновляем cValue
-                        myBasket.child(cUser!!.uid).child(ds.key!!).addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(basketDataSnapshot: DataSnapshot) {
-                                product.cValue =
-                                    basketDataSnapshot.child("count").getValue(Int::class.java) ?: 0
-                            }
-
-                            override fun onCancelled(basketDatabaseError: DatabaseError) {
-                                // Обработка ошибок при чтении корзины
-                            }
-                        })
                     }
                 }
-
-                listData.clear()
-                listData.addAll(products)
+                listData.value = products
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -99,6 +84,42 @@ class DbHelper {
             }
         })
     }
+
+//    fun getMenuFromFirebase(listData: MutableState<List<Product>>) {
+//        // Получаем данные из меню
+//        myMenu.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val products = mutableListOf<Product>()
+//                for (ds in dataSnapshot.children) {
+//                    val name = ds.child("name").getValue(String::class.java)
+//                    val description = ds.child("description").getValue(String::class.java)
+//                    val price = ds.child("price").getValue(Double::class.java)
+//
+//                    if (name != null && description != null && price != null) {
+//                        val product = Product(name = name, description = description, price = price)
+//                        products.add(product)
+//
+//                        // Получаем данные из корзины для данного продукта и обновляем cValue
+//                        myBasket.child(cUser!!.uid).child(ds.key!!).addListenerForSingleValueEvent(object : ValueEventListener {
+//                            override fun onDataChange(basketDataSnapshot: DataSnapshot) {
+//                                product.cValue =
+//                                    basketDataSnapshot.child("count").getValue(Int::class.java) ?: 0
+//                            }
+//
+//                            override fun onCancelled(basketDatabaseError: DatabaseError) {
+//                                // Обработка ошибок при чтении корзины
+//                            }
+//                        })
+//                    }
+//                }
+//                listData.value = products
+//            }
+//
+//            override fun onCancelled(databaseError: DatabaseError) {
+//                // Обработка ошибок
+//            }
+//        })
+//    }
 
     fun registration(
         login: String,
@@ -158,6 +179,30 @@ class DbHelper {
                         basketRef.child("description").setValue(description)
                     }
                 }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок
+            }
+        })
+    }
+
+    fun getBasketProductsFromFirebase(listData: MutableState<List<Product>>) {
+        myBasket.child(cUser!!.uid).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val updatedProducts = mutableListOf<Product>()
+
+                // Далее, обработка изменений в корзине и обновление соответствующих данных для списка меню
+                for (product in listData.value) {
+                    dataSnapshot.children.find { it.key == product.name }?.let { basketItem ->
+                        // Получаем обновленное количество товаров из корзины
+                        val count = basketItem.child("count").getValue(Int::class.java) ?: 0
+                        val updatedProduct = product.copy(cValue = count)
+                        updatedProducts.add(updatedProduct)
+                    } ?: updatedProducts.add(product)
+                }
+
+                listData.value = updatedProducts // Обновляем listData после изменений в корзине
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
