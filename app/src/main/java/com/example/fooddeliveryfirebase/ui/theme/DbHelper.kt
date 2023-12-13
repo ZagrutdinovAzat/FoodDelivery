@@ -85,41 +85,6 @@ class DbHelper {
         })
     }
 
-//    fun getMenuFromFirebase(listData: MutableState<List<Product>>) {
-//        // Получаем данные из меню
-//        myMenu.addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val products = mutableListOf<Product>()
-//                for (ds in dataSnapshot.children) {
-//                    val name = ds.child("name").getValue(String::class.java)
-//                    val description = ds.child("description").getValue(String::class.java)
-//                    val price = ds.child("price").getValue(Double::class.java)
-//
-//                    if (name != null && description != null && price != null) {
-//                        val product = Product(name = name, description = description, price = price)
-//                        products.add(product)
-//
-//                        // Получаем данные из корзины для данного продукта и обновляем cValue
-//                        myBasket.child(cUser!!.uid).child(ds.key!!).addListenerForSingleValueEvent(object : ValueEventListener {
-//                            override fun onDataChange(basketDataSnapshot: DataSnapshot) {
-//                                product.cValue =
-//                                    basketDataSnapshot.child("count").getValue(Int::class.java) ?: 0
-//                            }
-//
-//                            override fun onCancelled(basketDatabaseError: DatabaseError) {
-//                                // Обработка ошибок при чтении корзины
-//                            }
-//                        })
-//                    }
-//                }
-//                listData.value = products
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                // Обработка ошибок
-//            }
-//        })
-//    }
 
     fun registration(
         login: String,
@@ -170,6 +135,9 @@ class DbHelper {
 
                 val newCount = currentCount + c
                 if (newCount <= 0) {
+                    if (newCount == 0) {
+                        basketRef.child("count").setValue(newCount)
+                    }
                     basketRef.removeValue()
                 } else {
                     basketRef.child("count").setValue(newCount)
@@ -179,6 +147,7 @@ class DbHelper {
                         basketRef.child("description").setValue(description)
                     }
                 }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

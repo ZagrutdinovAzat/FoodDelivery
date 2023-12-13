@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -72,7 +72,7 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
-            .padding(bottom = 30.dp),
+            .padding(bottom = 55.dp),
         contentPadding = PaddingValues(16.dp),
     ) {
         itemsIndexed(listData.value) { _, menuItem ->
@@ -130,7 +130,14 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
                                 horizontalArrangement = Arrangement.End,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                AddRemoveButtons(icon = Icons.Sharp.Delete, db, menuItem.name, menuItem.price, menuItem.description, -1)
+                                AddRemoveButtons(
+                                    icon = Icons.Sharp.Delete,
+                                    db,
+                                    menuItem.name,
+                                    menuItem.price,
+                                    menuItem.description,
+                                    -1
+                                )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = menuItem.cValue.toString(), /* Текущее количество товаров */
@@ -138,7 +145,14 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
-                                AddRemoveButtons(icon = Icons.Sharp.Add, db, menuItem.name, menuItem.price, menuItem.description,1)
+                                AddRemoveButtons(
+                                    icon = Icons.Sharp.Add,
+                                    db,
+                                    menuItem.name,
+                                    menuItem.price,
+                                    menuItem.description,
+                                    1
+                                )
                             }
                         }
                     }
@@ -149,9 +163,16 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
 }
 
 @Composable
-fun AddRemoveButtons(icon: ImageVector, db: DbHelper, /*menuItem: Product*/name: String, price: Double?, description: String?, c: Int) {
+fun AddRemoveButtons(
+    icon: ImageVector,
+    db: DbHelper, /*menuItem: Product*/
+    name: String,
+    price: Double?,
+    description: String?,
+    c: Int
+) {
     IconButton(
-        onClick = { db.addInBasket(name, price,description, c) },
+        onClick = { db.addInBasket(name, price, description, c) },
         modifier = Modifier
             .size(50.dp)
             .border(
@@ -176,31 +197,43 @@ fun BottomBar(navController: NavController, function: @Composable () -> Unit) {
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier
-                    .background(Color.Black)
-                    .height(40.dp)
+                    .background(Color.Transparent)
+                    .height(60.dp)
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Black)
-                ) {
-                    IconButton(onClick = { navController.navigate(Marshroutes.route4) }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.White)
+                Column {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                    ) {
+                        Text("place an order for", fontSize = 12.sp)
                     }
-                    IconButton(onClick = { navController.navigate(Marshroutes.route6) }) {
-                        Icon(
-                            Icons.Filled.ShoppingCart,
-                            contentDescription = "Cart",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
-                        Icon(
-                            Icons.Filled.Person,
-                            contentDescription = "Profile",
-                            tint = Color.White
-                        )
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                    ) {
+                        IconButton(onClick = { navController.navigate(Marshroutes.route4) }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
+                        }
+                        IconButton(onClick = { navController.navigate(Marshroutes.route6) }) {
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = "Cart",
+                                tint = Color.Black
+                            )
+                        }
+                        IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
+                            Icon(
+                                Icons.Filled.Person,
+                                contentDescription = "Profile",
+                                tint = Color.Black
+                            )
+                        }
                     }
                 }
             }

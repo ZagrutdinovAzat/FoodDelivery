@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
 import com.example.fooddeliveryfirebase.R
+import androidx.compose.runtime.rememberCoroutineScope as rememberCoroutineScope1
 
 @Composable
 fun LoginScreen(
@@ -108,6 +109,7 @@ fun LoginScreen(
 }
 
 fun makeToast(context: Context, text: String) {
+
     Toast.makeText(
         context,
         text,

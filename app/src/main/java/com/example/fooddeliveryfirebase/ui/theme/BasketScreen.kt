@@ -18,10 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,9 +38,13 @@ import androidx.navigation.NavController
 @Composable
 fun BasketScreen(navController: NavController, db: DbHelper) {
     val listData = remember { mutableStateOf(emptyList<BasketItem>()) }
-    db.getBasketFromFirebase(listData)
+    LaunchedEffect(Unit) {
+        db.getBasketFromFirebase(listData)
+    }
 
-    BottomBar(navController = navController, function = { MyBasket(listData = listData.value, db = db) })
+    BottomBar(
+        navController = navController,
+        function = { MyBasket(listData = listData.value, db = db) })
 }
 
 
@@ -64,7 +68,6 @@ fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
             color = Color.White
         )
         LazyBasket(listData = listData, db = db)
-
     }
 }
 
@@ -101,14 +104,6 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                             color = Color.White,
                             modifier = Modifier.padding(start = 8.dp),
                         )
-//                        Text(
-//                            text = menuItem.cValue.toString(),
-//                            style = TextStyle(
-//                                fontSize = 14.sp
-//                            ),
-//                            color = Color.Gray,
-//                            modifier = Modifier.padding(start = 8.dp)
-//                        )
 
                         Text(
                             text = menuItem.description.toString(),
@@ -131,7 +126,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                 AddRemoveButtons(
                                     icon = Icons.Sharp.Delete,
                                     db,
-                                    menuItem.key.toString(),
+                                    menuItem.key,
                                     null,
                                     null,
                                     -1
