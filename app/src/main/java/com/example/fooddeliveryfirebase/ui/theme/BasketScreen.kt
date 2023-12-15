@@ -1,5 +1,6 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -10,18 +11,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableDoubleState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,21 +49,85 @@ import androidx.navigation.NavController
 
 @Composable
 fun BasketScreen(navController: NavController, db: DbHelper) {
-    val listData = remember { mutableStateOf(emptyList<BasketItem>()) }
+    val listData = remember { mutableStateOf(emptyList<Product>()) }
     LaunchedEffect(Unit) {
         db.getBasketFromFirebase(listData)
     }
 
-    BottomBar(
+    val cost = remember { mutableStateOf(0.0) }
+    LaunchedEffect(listData.value) {
+        cost.value = listData.value.sumByDouble { it.cValue!! * it.price }
+    }
+
+    BottomBarForCart(
         navController = navController,
-        function = { MyBasket(listData = listData.value, db = db) })
+        function = { MyBasket(listData = listData.value, db = db) },
+        cost = cost.value
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun BottomBarForCart(
+    navController: NavController,
+    function: @Composable () -> Unit,
+    cost: Double
+) {
+    Scaffold(
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .height(60.dp)
+            ) {
+                Column {
+                    Button(
+                        onClick = { navController.navigate(Marshroutes.orderRoute) },
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                    ) {
+                        Text("place an order for $${cost}", fontSize = 12.sp)
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                    ) {
+                        IconButton(onClick = { navController.navigate(Marshroutes.menuRoute) }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
+                        }
+                        IconButton(onClick = { navController.navigate(Marshroutes.basketRoute) }) {
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = "Cart",
+                                tint = Color.Black
+                            )
+                        }
+                        IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
+                            Icon(
+                                Icons.Filled.Person,
+                                contentDescription = "Profile",
+                                tint = Color.Black
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    )
+    {
+        function()
+    }
 }
 
 
-data class BasketItem(val key: String, var cValue: Int, var price: Double, var description: String?)
-
 @Composable
-fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
+fun MyBasket(listData: List<Product>, db: DbHelper) {
     BackGroundImage()
     Column {
         Text(
@@ -72,12 +148,12 @@ fun MyBasket(listData: List<BasketItem>, db: DbHelper) {
 }
 
 @Composable
-fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
+fun LazyBasket(listData: List<Product>, db: DbHelper) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Transparent)
-            .padding(bottom = 30.dp),
+            .padding(bottom = 55.dp),
         contentPadding = PaddingValues(16.dp),
     ) {
         itemsIndexed(listData) { _, menuItem ->
@@ -96,7 +172,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                 ) {
                     Column {
                         Text(
-                            text = menuItem.key,
+                            text = menuItem.name,
                             style = TextStyle(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp
@@ -114,6 +190,19 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                             modifier = Modifier.padding(start = 8.dp)
                         )
 
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 8.dp),
+                            text = "$${menuItem.price}",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            ),
+                            color = Color.White,
+                            textAlign = TextAlign.Right
+                        )
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -126,7 +215,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                 AddRemoveButtons(
                                     icon = Icons.Sharp.Delete,
                                     db,
-                                    menuItem.key,
+                                    menuItem.name,
                                     null,
                                     null,
                                     -1
@@ -141,7 +230,7 @@ fun LazyBasket(listData: List<BasketItem>, db: DbHelper) {
                                 AddRemoveButtons(
                                     icon = Icons.Sharp.Add,
                                     db,
-                                    menuItem.key,
+                                    menuItem.name,
                                     null,
                                     null,
                                     1

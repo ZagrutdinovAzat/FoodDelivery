@@ -94,7 +94,7 @@ fun LoginScreen(
             onClick = {
                 login = ""
                 password = ""
-                navController.navigate(Marshroutes.route2)
+                navController.navigate(Marshroutes.registrationRoute)
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent

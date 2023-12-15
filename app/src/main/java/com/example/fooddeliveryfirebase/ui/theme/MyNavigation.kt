@@ -12,38 +12,42 @@ object MyNavigation {
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = start)
         {
-            composable(route = Marshroutes.route1) {
+            composable(route = Marshroutes.loginRoute) {
                 LoginScreen(navController = navController, db)
             }
-            composable(route = Marshroutes.route2) {
+            composable(route = Marshroutes.registrationRoute) {
                 RegistrationScreen(navController = navController, db)
             }
-            composable(route = Marshroutes.route3)
+            composable(route = Marshroutes.profileRoute)
             {
                 ConnectingScreen(navController = navController, db)
             }
-            composable(route = Marshroutes.route4)
+            composable(route = Marshroutes.menuRoute)
             {
                 MenuScreen(db, navController)
             }
 
-            composable(route = Marshroutes.route5)
+            composable(route = Marshroutes.forAdminRoute)
             {
                 ForAdminScreen(imgHandler, db)
             }
-            composable(route = Marshroutes.route6)
+            composable(route = Marshroutes.basketRoute)
             {
                 BasketScreen(navController = navController,db = db)
+            }
+            composable(route = Marshroutes.orderRoute) {
+                CheckoutScreen(navController = navController, db)
             }
         }
     }
 }
 
 object Marshroutes {
-    const val route1 = "LogIn"
-    const val route2 = "Registration"
-    const val route3 = "Profile"
-    const val route4 = "Menu"
-    const val route5 = "ForAdmin"
-    const val route6 = "Basket"
+    const val loginRoute = "LogIn"
+    const val registrationRoute = "Registration"
+    const val profileRoute = "Profile"
+    const val menuRoute = "Menu"
+    const val forAdminRoute = "ForAdmin"
+    const val basketRoute = "Basket"
+    const val orderRoute = "Order"
 }

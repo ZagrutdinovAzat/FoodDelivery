@@ -61,7 +61,9 @@ fun MenuScreen(db: DbHelper, navController: NavController) {
         db.getBasketProductsFromFirebase(listData)
     }
 
-    BottomBar(navController = navController, function = { MyMenu(listData = listData, db = db) })
+    BottomBarForMenu(
+        navController = navController,
+        function = { MyMenu(listData = listData, db = db) })
 
 }
 
@@ -165,7 +167,7 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
 @Composable
 fun AddRemoveButtons(
     icon: ImageVector,
-    db: DbHelper, /*menuItem: Product*/
+    db: DbHelper,
     name: String,
     price: Double?,
     description: String?,
@@ -192,48 +194,37 @@ fun AddRemoveButtons(
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BottomBar(navController: NavController, function: @Composable () -> Unit) {
+fun BottomBarForMenu(navController: NavController, function: @Composable () -> Unit) {
     Scaffold(
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier
                     .background(Color.Transparent)
-                    .height(60.dp)
+                    .height(30.dp)
             ) {
-                Column {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier
-                            .height(30.dp)
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                    ) {
-                        Text("place an order for", fontSize = 12.sp)
-                    }
 
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent)
-                    ) {
-                        IconButton(onClick = { navController.navigate(Marshroutes.route4) }) {
-                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
-                        }
-                        IconButton(onClick = { navController.navigate(Marshroutes.route6) }) {
-                            Icon(
-                                Icons.Filled.ShoppingCart,
-                                contentDescription = "Cart",
-                                tint = Color.Black
-                            )
-                        }
-                        IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
-                            Icon(
-                                Icons.Filled.Person,
-                                contentDescription = "Profile",
-                                tint = Color.Black
-                            )
-                        }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                ) {
+                    IconButton(onClick = { navController.navigate(Marshroutes.menuRoute) }) {
+                        Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
+                    }
+                    IconButton(onClick = { navController.navigate(Marshroutes.basketRoute) }) {
+                        Icon(
+                            Icons.Filled.ShoppingCart,
+                            contentDescription = "Cart",
+                            tint = Color.Black
+                        )
+                    }
+                    IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
+                        Icon(
+                            Icons.Filled.Person,
+                            contentDescription = "Profile",
+                            tint = Color.Black
+                        )
                     }
                 }
             }

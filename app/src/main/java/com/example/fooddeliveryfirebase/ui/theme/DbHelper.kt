@@ -46,7 +46,7 @@ class DbHelper {
                     if (mAuth.currentUser!!.isEmailVerified) {
                         cUser = mAuth.currentUser
                         makeToast(context, "Authentication successful.")
-                        navController.navigate(Marshroutes.route3)
+                        navController.navigate(Marshroutes.profileRoute)
                     } else {
                         makeToast(context, "Confirm your email.")
                     }
@@ -59,7 +59,7 @@ class DbHelper {
 
     fun logOut(navController: NavController) {
         mAuth.signOut()
-        navController.navigate(Marshroutes.route1)
+        navController.navigate(Marshroutes.loginRoute)
     }
 
     fun getMenuFromFirebase(listData: MutableState<List<Product>>) {
@@ -103,7 +103,7 @@ class DbHelper {
                                         context = context,
                                         "Registration is successful, check your email for confirmation"
                                     )
-                                    navController.navigate(Marshroutes.route1)
+                                    navController.navigate(Marshroutes.loginRoute)
                                 } else {
                                     makeToast(
                                         context = context,
@@ -180,18 +180,17 @@ class DbHelper {
         })
     }
 
-
-    fun getBasketFromFirebase(listData: MutableState<List<BasketItem>>) {
+    fun getBasketFromFirebase(listData: MutableState<List<Product>>) {
         myBasket.child(cUser!!.uid).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val items = mutableListOf<BasketItem>()
+                val items = mutableListOf<Product>()
                 dataSnapshot.children.forEach { dishSnapshot ->
                     val idDish = dishSnapshot.key ?: ""
                     val count = dishSnapshot.child("count").getValue(Int::class.java) ?: 0
                     val price = dishSnapshot.child("price").getValue(Double::class.java) ?: 0.0
                     val description =
                         dishSnapshot.child("description").getValue(String()::class.java) ?: ""
-                    items.add(BasketItem(idDish, count, price, description))
+                    items.add(Product(name = idDish, cValue = count, price = price, description = description))
                 }
                 listData.value = items
             }

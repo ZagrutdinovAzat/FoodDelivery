@@ -60,7 +60,7 @@ fun LogOutButton(db: DbHelper, navController: NavController) {
 fun ResumeButton(navController: NavController) {
     Button(
         onClick = {
-            navController.navigate(Marshroutes.route4)
+            navController.navigate(Marshroutes.menuRoute)
         }, shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
@@ -77,7 +77,7 @@ fun ResumeButton(navController: NavController) {
 fun ForAdminButton(navController: NavController) {
     Button(
         onClick = {
-            navController.navigate(Marshroutes.route5)
+            navController.navigate(Marshroutes.forAdminRoute)
         }, shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent

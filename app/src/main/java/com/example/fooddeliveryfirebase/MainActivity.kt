@@ -45,9 +45,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val start: String = if (db.userStatusLiveData.value == 1) {
-                        Marshroutes.route3
+                        Marshroutes.profileRoute
                     } else {
-                        Marshroutes.route1
+                        Marshroutes.loginRoute
                     }
                     MyNavigation.MinimalNavigation(db, start, imgHandler)
                 }
