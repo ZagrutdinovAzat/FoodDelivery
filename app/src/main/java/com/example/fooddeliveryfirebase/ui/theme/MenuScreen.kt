@@ -69,7 +69,7 @@ fun MenuScreen(db: DbHelper, navController: NavController) {
 
 
 @Composable
-fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
+fun LazyColumnWithDish(listData: MutableState<List<Product>>, db: DbHelper) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -92,16 +92,31 @@ fun LazyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
                         )
                 ) {
                     Column {
-
-                        Text(
-                            text = menuItem.name,
-                            style = TextStyle(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            ),
-                            color = Color.White,
-                            modifier = Modifier.padding(start = 8.dp),
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = menuItem.name,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp
+                                ),
+                                color = Color.White,
+                                modifier = Modifier.padding(start = 8.dp),
+                            )
+                            if (menuItem.cValue!! * menuItem.price != 0.0) {
+                                Text(
+                                    text = "Full price: $${"%.2f".format(menuItem.cValue!! * menuItem.price)}",
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    ),
+                                    color = Color.White,
+                                    modifier = Modifier.padding(end = 8.dp), // Используйте padding справа вместо слева
+                                )
+                            }
+                        }
                         Text(
                             text = menuItem.description,
                             style = TextStyle(
@@ -252,7 +267,7 @@ fun MyMenu(listData: MutableState<List<Product>>, db: DbHelper) {
                 ),
             color = Color.White
         )
-        LazyMenu(listData = listData, db = db)
+        LazyColumnWithDish(listData = listData, db = db)
 
     }
 }

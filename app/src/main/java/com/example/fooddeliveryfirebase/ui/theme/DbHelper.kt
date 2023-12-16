@@ -25,8 +25,10 @@ class DbHelper {
     private val myMenu: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("Menu") // подключение к меню
 
-    val myBasket: DatabaseReference =
+    private val myBasket: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("Basket") // подключение к корзине
+
+    private val myOrders: DatabaseReference = FirebaseDatabase.getInstance().getReference("Orders")
 
 
     fun checkUser(context: Context) {
@@ -190,7 +192,14 @@ class DbHelper {
                     val price = dishSnapshot.child("price").getValue(Double::class.java) ?: 0.0
                     val description =
                         dishSnapshot.child("description").getValue(String()::class.java) ?: ""
-                    items.add(Product(name = idDish, cValue = count, price = price, description = description))
+                    items.add(
+                        Product(
+                            name = idDish,
+                            cValue = count,
+                            price = price,
+                            description = description
+                        )
+                    )
                 }
                 listData.value = items
             }
@@ -201,4 +210,61 @@ class DbHelper {
         })
     }
 
+    fun placeOrder(
+        address: String,
+        phoneNumber: String,
+        date: String,
+        price: Double,
+        basket: List<Product>,
+        cont: Context
+    ) {
+
+        var v = 0
+
+        if (address == "" || phoneNumber == "" || date == "") {
+            v = 1
+        }
+
+        if (basket.isEmpty()) {
+            v = 2
+        }
+
+        if (v == 0) {
+            val userRef = myOrders.child(cUser!!.uid)
+            val orderRef = userRef.push()
+
+            val serializedBasket = basket.associate { product ->
+                product.name to mapOf(
+                    "price" to product.price,
+                    "cValue" to product.cValue
+                )
+            }
+            // when
+
+            val orderData = hashMapOf(
+                "address" to address,
+                "phoneNumber" to phoneNumber,
+                "date" to date,
+                "price" to price,
+                "basket" to serializedBasket
+            )
+
+            orderRef.setValue(orderData).addOnSuccessListener {
+                // Запись прошла успешно
+                myBasket.child(cUser!!.uid).removeValue()
+            }
+                .addOnFailureListener {
+                    v = 3
+                }
+        }
+
+        when (v) {
+            0 -> makeToast(context = cont, text = "The order has been successfully created")
+            1 -> makeToast(context = cont, text = "Fill in all the fields")
+            2 -> makeToast(context = cont, text = "Cart is empty")
+            3 -> makeToast(context = cont, text = "Error when creating an order")
+        }
+
+
+    }
 }
