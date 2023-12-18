@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val start: String = if (db.userStatusLiveData.value == 1) {
-                        Marshroutes.profileRoute
+                        Marshroutes.connectingRoute
                     } else {
                         Marshroutes.loginRoute
                     }

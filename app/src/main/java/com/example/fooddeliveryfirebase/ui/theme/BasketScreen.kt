@@ -93,7 +93,7 @@ fun BottomBarForCart(
                                 tint = Color.Black
                             )
                         }
-                        IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
+                        IconButton(onClick = { navController.navigate(Marshroutes.profileRoute) }) {
                             Icon(
                                 Icons.Filled.Person,
                                 contentDescription = "Profile",

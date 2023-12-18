@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -113,7 +112,7 @@ fun LazyColumnWithDish(listData: MutableState<List<Product>>, db: DbHelper) {
                                         fontSize = 18.sp
                                     ),
                                     color = Color.White,
-                                    modifier = Modifier.padding(end = 8.dp), // Используйте padding справа вместо слева
+                                    modifier = Modifier.padding(end = 8.dp),
                                 )
                             }
                         }
@@ -157,7 +156,7 @@ fun LazyColumnWithDish(listData: MutableState<List<Product>>, db: DbHelper) {
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = menuItem.cValue.toString(), /* Текущее количество товаров */
+                                    text = menuItem.cValue.toString(),
                                     color = Color.White,
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 )
@@ -234,7 +233,7 @@ fun BottomBarForMenu(navController: NavController, function: @Composable () -> U
                             tint = Color.Black
                         )
                     }
-                    IconButton(onClick = { /* Действие при нажатии кнопки "Profile" */ }) {
+                    IconButton(onClick = { navController.navigate(Marshroutes.profileRoute) }) {
                         Icon(
                             Icons.Filled.Person,
                             contentDescription = "Profile",

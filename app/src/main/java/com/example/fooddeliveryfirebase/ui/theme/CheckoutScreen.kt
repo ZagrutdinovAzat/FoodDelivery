@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import java.time.LocalTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -129,7 +129,8 @@ fun CheckoutScreen(
                             date = deliveryTime.value,
                             price = totalCost.value,
                             basket = listData.value,
-                            cont = cont
+                            cont = cont,
+                            navController = navController
                         )
                     },
                     modifier = Modifier
@@ -145,8 +146,8 @@ fun CheckoutScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun calculateDeliveryTime(): String {
-    val currentTime = LocalTime.now()
-    val estimatedDeliveryTime = currentTime.plusHours(1)
-    return DateTimeFormatter.ofPattern("HH:mm").format(estimatedDeliveryTime)
+    val currentDateTime = LocalDateTime.now()
+    val estimatedDeliveryTime = currentDateTime.plusHours(1)
+    return DateTimeFormatter.ofPattern("yyyy:MM:dd:HH:mm").format(estimatedDeliveryTime)
 }
 

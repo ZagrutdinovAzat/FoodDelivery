@@ -1,6 +1,8 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
@@ -13,6 +15,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class DbHelper {
 
@@ -48,7 +52,7 @@ class DbHelper {
                     if (mAuth.currentUser!!.isEmailVerified) {
                         cUser = mAuth.currentUser
                         makeToast(context, "Authentication successful.")
-                        navController.navigate(Marshroutes.profileRoute)
+                        navController.navigate(Marshroutes.connectingRoute)
                     } else {
                         makeToast(context, "Confirm your email.")
                     }
@@ -210,13 +214,15 @@ class DbHelper {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun placeOrder(
         address: String,
         phoneNumber: String,
         date: String,
         price: Double,
         basket: List<Product>,
-        cont: Context
+        cont: Context,
+        navController: NavController
     ) {
 
         var v = 0
@@ -236,15 +242,17 @@ class DbHelper {
             val serializedBasket = basket.associate { product ->
                 product.name to mapOf(
                     "price" to product.price,
-                    "cValue" to product.cValue
+                    "cValue" to product.cValue,
+                    "description" to product.description
                 )
             }
-            // when
 
             val orderData = hashMapOf(
                 "address" to address,
                 "phoneNumber" to phoneNumber,
-                "date" to date,
+                "order date" to DateTimeFormatter.ofPattern("yyyy:MM:dd:HH:mm")
+                    .format(LocalDateTime.now()),
+                "estimated order date" to date,
                 "price" to price,
                 "basket" to serializedBasket
             )
@@ -259,12 +267,75 @@ class DbHelper {
         }
 
         when (v) {
-            0 -> makeToast(context = cont, text = "The order has been successfully created")
+            0 -> {
+                makeToast(context = cont, text = "The order has been successfully created")
+                navController.navigate(Marshroutes.menuRoute)
+            }
+
             1 -> makeToast(context = cont, text = "Fill in all the fields")
             2 -> makeToast(context = cont, text = "Cart is empty")
             3 -> makeToast(context = cont, text = "Error when creating an order")
         }
+    }
 
 
+    fun getAllOrdersForUser(listData: MutableState<List<Order>>) {
+        val userOrdersRef = myOrders.child(cUser!!.uid)
+
+
+        userOrdersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val ordersList = mutableListOf<Order>()
+                for (orderSnapshot in dataSnapshot.children) {
+                    val orderId = orderSnapshot.key
+                    val address = orderSnapshot.child("address").getValue(String::class.java)
+                    val estimatedOrderDate =
+                        orderSnapshot.child("estimated order date").getValue(String::class.java)
+                    val orderDate = orderSnapshot.child("order date").getValue(String::class.java)
+                    val phoneNumber =
+                        orderSnapshot.child("phoneNumber").getValue(String::class.java)
+                    val totalPrice = orderSnapshot.child("price").getValue(Double::class.java)
+
+                    val basket = mutableListOf<Product>()
+                    val basketSnapshot = orderSnapshot.child("basket")
+
+                    for (itemSnapshot in basketSnapshot.children) {
+                        val dishName = itemSnapshot.key.toString()
+                        val count = itemSnapshot.child("count").getValue(Int::class.java)
+                        val price = itemSnapshot.child("price").getValue(Double::class.java)
+                        val description =
+                            itemSnapshot.child("description").getValue(String::class.java)
+
+                        if (dishName != null && count != null && price != null && description != null) {
+                            val product = Product(
+                                name = dishName,
+                                cValue = count,
+                                description = description,
+                                price = price
+                            )
+                            basket.add(product)
+                        }
+                    }
+
+                    if (orderId != null && address != null && estimatedOrderDate != null && orderDate != null && phoneNumber != null && totalPrice != null) {
+                        val order = Order(
+                            id = orderId,
+                            address = address,
+                            basket = basket,
+                            estimatedOrderDate = estimatedOrderDate,
+                            orderDate = orderDate,
+                            phoneNumber = phoneNumber,
+                            price = totalPrice
+                        )
+                        ordersList.add(order)
+                    }
+                }
+                listData.value = ordersList
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок, если не удалось получить данные
+            }
+        })
     }
 }
