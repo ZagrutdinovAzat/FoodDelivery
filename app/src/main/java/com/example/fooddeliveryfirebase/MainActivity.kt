@@ -1,11 +1,13 @@
 package com.example.fooddeliveryfirebase
 
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,15 +24,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.fooddeliveryfirebase.ui.theme.DbHelper
 import com.example.fooddeliveryfirebase.ui.theme.FoodDeliveryFireBaseTheme
 import com.example.fooddeliveryfirebase.ui.theme.Marshroutes
 import com.example.fooddeliveryfirebase.ui.theme.MyNavigation
 
-import com.example.fooddeliveryfirebase.ui.theme.DbHelper
-
 class MainActivity : ComponentActivity() {
     private val db: DbHelper = DbHelper()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

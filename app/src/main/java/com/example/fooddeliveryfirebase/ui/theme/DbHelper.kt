@@ -296,32 +296,10 @@ class DbHelper {
                         orderSnapshot.child("phoneNumber").getValue(String::class.java)
                     val totalPrice = orderSnapshot.child("price").getValue(Double::class.java)
 
-                    val basket = mutableListOf<Product>()
-                    val basketSnapshot = orderSnapshot.child("basket")
-
-                    for (itemSnapshot in basketSnapshot.children) {
-                        val dishName = itemSnapshot.key.toString()
-                        val count = itemSnapshot.child("count").getValue(Int::class.java)
-                        val price = itemSnapshot.child("price").getValue(Double::class.java)
-                        val description =
-                            itemSnapshot.child("description").getValue(String::class.java)
-
-                        if (dishName != null && count != null && price != null && description != null) {
-                            val product = Product(
-                                name = dishName,
-                                cValue = count,
-                                description = description,
-                                price = price
-                            )
-                            basket.add(product)
-                        }
-                    }
-
                     if (orderId != null && address != null && estimatedOrderDate != null && orderDate != null && phoneNumber != null && totalPrice != null) {
                         val order = Order(
                             id = orderId,
                             address = address,
-                            basket = basket,
                             estimatedOrderDate = estimatedOrderDate,
                             orderDate = orderDate,
                             phoneNumber = phoneNumber,
@@ -335,6 +313,37 @@ class DbHelper {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Обработка ошибок, если не удалось получить данные
+            }
+        })
+    }
+
+    fun getBasketForOrder(orderId: String, listData: MutableState<List<Product>>) {
+        val orderRef = myOrders.child(cUser!!.uid).child(orderId).child("basket")
+
+        orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val basketList = mutableListOf<Product>()
+                for (itemSnapshot in dataSnapshot.children) {
+                    val dishName = itemSnapshot.key
+                    val count = itemSnapshot.child("cValue").getValue(Int::class.java)
+                    val price = itemSnapshot.child("price").getValue(Double::class.java)
+                    val description = itemSnapshot.child("description").getValue(String::class.java)
+                    if (dishName != null && count != null && price != null) {
+                        val product = Product(
+                            name = dishName.toString(),
+                            cValue = count,
+                            price = price,
+                            description = description!!
+                        )
+                        basketList.add(product)
+                    }
+                }
+                listData.value = basketList
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибок, если не удалось получить данные
+                // Например, вызов callback с пустым списком
             }
         })
     }

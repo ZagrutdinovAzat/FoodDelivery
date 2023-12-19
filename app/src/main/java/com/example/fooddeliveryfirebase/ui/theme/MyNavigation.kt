@@ -48,7 +48,12 @@ object MyNavigation {
 
             composable(route = Marshroutes.currentOrdersRoute)
             {
-                CurrentOrders(db = db)
+                CurrentOrders(db = db, navController = navController)
+            }
+
+            composable(route = "${Marshroutes.orderBasketRoute}/{orderId}") { backStackEntry ->
+                val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
+                OrderBasketScreen(db = db, orderId = orderId)
             }
         }
     }
@@ -65,4 +70,5 @@ object Marshroutes {
     const val profileRoute = "Profile"
 
     const val currentOrdersRoute = "CurrentOrders"
+    const val orderBasketRoute = "OrderBasket"
 }
