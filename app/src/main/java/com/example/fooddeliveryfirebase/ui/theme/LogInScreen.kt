@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
 import com.example.fooddeliveryfirebase.R
-import androidx.compose.runtime.rememberCoroutineScope as rememberCoroutineScope1
 
 @Composable
 fun LoginScreen(
@@ -77,7 +76,12 @@ fun LoginScreen(
                 if (login == "" || password == "") {
                     makeToast(context = context, text = "Fill in all the fields")
                 } else {
-                    db.logIn(login, password, context, navController)
+                    db.logIn(login, password, context, navController) { success ->
+                        if (success) {
+                            login = ""
+                            password = ""
+                        }
+                    }
                 }
             },
             colors = ButtonDefaults.buttonColors(

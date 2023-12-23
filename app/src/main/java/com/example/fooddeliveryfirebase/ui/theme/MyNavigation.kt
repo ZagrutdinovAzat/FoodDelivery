@@ -23,6 +23,7 @@ object MyNavigation {
             }
             composable(route = Marshroutes.connectingRoute)
             {
+                //db.addInUser()
                 ConnectingScreen(navController = navController, db)
             }
             composable(route = Marshroutes.menuRoute)
@@ -36,7 +37,7 @@ object MyNavigation {
             }
             composable(route = Marshroutes.basketRoute)
             {
-                BasketScreen(navController = navController,db = db)
+                BasketScreen(navController = navController, db = db)
             }
             composable(route = Marshroutes.orderRoute) {
                 CheckoutScreen(navController = navController, db)

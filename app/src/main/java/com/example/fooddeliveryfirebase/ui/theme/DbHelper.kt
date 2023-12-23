@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -21,6 +22,7 @@ import java.time.format.DateTimeFormatter
 class DbHelper {
 
     private var mAuth: FirebaseAuth = Firebase.auth
+    var userRole: Int? = 0
 
     val userStatusLiveData = MutableLiveData<Int>() // пользователь авторизован/нет
 
@@ -34,30 +36,61 @@ class DbHelper {
 
     private val myOrders: DatabaseReference = FirebaseDatabase.getInstance().getReference("Orders")
 
+    val userRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
+
 
     fun checkUser(context: Context) {
         if (cUser != null) {
             makeToast(context = context, "User not null")
             userStatusLiveData.value = 1
+            addInUser()
         } else {
             makeToast(context = context, "User null")
             userStatusLiveData.value = 0
         }
     }
 
-    fun logIn(login: String, password: String, context: Context, navController: NavController) {
+    fun addInUser() {
+        userRef.child(cUser!!.uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    userRole = dataSnapshot.getValue(Int::class.java)
+                } else {
+                    userRef.child(cUser!!.uid).setValue(0)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибки запроса
+            }
+        })
+    }
+
+    fun logIn(
+        login: String,
+        password: String,
+        context: Context,
+        navController: NavController,
+        callback: (Boolean) -> Unit
+    ) {
         mAuth.signInWithEmailAndPassword(login, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     if (mAuth.currentUser!!.isEmailVerified) {
                         cUser = mAuth.currentUser
                         makeToast(context, "Authentication successful.")
+
+                        addInUser()
+
                         navController.navigate(Marshroutes.connectingRoute)
+                        callback(true)
                     } else {
                         makeToast(context, "Confirm your email.")
+                        callback(false)
                     }
                 } else {
                     makeToast(context = context, "Authentication failed.")
+                    callback(false)
                 }
             }
     }
@@ -65,7 +98,11 @@ class DbHelper {
 
     fun logOut(navController: NavController) {
         mAuth.signOut()
-        navController.navigate(Marshroutes.loginRoute)
+        navController.navigate(
+            route = Marshroutes.loginRoute, navOptions =
+            NavOptions.Builder().setPopUpTo(Marshroutes.connectingRoute, true).build()
+        )
+
     }
 
     fun getMenuFromFirebase(listData: MutableState<List<Product>>) {

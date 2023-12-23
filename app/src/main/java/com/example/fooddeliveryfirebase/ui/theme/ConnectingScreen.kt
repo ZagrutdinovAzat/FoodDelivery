@@ -10,7 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,11 +29,12 @@ fun ConnectingScreen(navController: NavController, db: DbHelper) {
         if (userEmail != null)
             Text(text = "You are logged in: $userEmail", color = Color.White)
 
-        LogOutButton(db = db, navController = navController)
-
         ResumeButton(navController = navController)
 
-        ForAdminButton(navController = navController)
+        LogOutButton(db = db, navController = navController)
+
+        if (db.userRole == 2)
+            ForAdminButton(navController = navController)
 
     }
 }
