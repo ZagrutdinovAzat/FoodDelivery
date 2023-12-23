@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -216,29 +217,37 @@ fun BottomBarForMenu(navController: NavController, function: @Composable () -> U
                     .background(Color.Transparent)
                     .height(30.dp)
             ) {
+                Column {
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent)
-                ) {
-                    IconButton(onClick = { navController.navigate(Marshroutes.menuRoute) }) {
-                        Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
-                    }
-                    IconButton(onClick = { navController.navigate(Marshroutes.basketRoute) }) {
-                        Icon(
-                            Icons.Filled.ShoppingCart,
-                            contentDescription = "Cart",
-                            tint = Color.Black
-                        )
-                    }
-                    IconButton(onClick = { navController.navigate(Marshroutes.profileRoute) }) {
-                        Icon(
-                            Icons.Filled.Person,
-                            contentDescription = "Profile",
-                            tint = Color.Black
-                        )
+                    Divider(
+                        color = Color.White,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                    ) {
+                        IconButton(onClick = { navController.navigate(Marshroutes.menuRoute) }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.White)
+                        }
+                        IconButton(onClick = { navController.navigate(Marshroutes.basketRoute) }) {
+                            Icon(
+                                Icons.Filled.ShoppingCart,
+                                contentDescription = "Cart",
+                                tint = Color.White
+                            )
+                        }
+                        IconButton(onClick = { navController.navigate(Marshroutes.profileRoute) }) {
+                            Icon(
+                                Icons.Filled.Person,
+                                contentDescription = "Profile",
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
             }

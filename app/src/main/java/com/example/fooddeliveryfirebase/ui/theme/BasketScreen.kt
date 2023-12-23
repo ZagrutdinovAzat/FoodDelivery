@@ -1,18 +1,21 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,15 +43,15 @@ fun BasketScreen(navController: NavController, db: DbHelper) {
         db.getBasketFromFirebase(listData)
     }
 
-    val cost = remember { mutableStateOf(0.0) }
+    val cost = remember { mutableDoubleStateOf(0.0) }
     LaunchedEffect(listData.value) {
-        cost.value = listData.value.sumByDouble { it.cValue!! * it.price }
+        cost.doubleValue = listData.value.sumOf { it.cValue!! * it.price }
     }
 
     BottomBarForCart(
         navController = navController,
         function = { MyBasket(listData = listData, db = db) },
-        cost = cost.value
+        cost = cost.doubleValue
     )
 }
 
@@ -72,7 +76,10 @@ fun BottomBarForCart(
                         modifier = Modifier
                             .height(30.dp)
                             .fillMaxWidth()
-                            .background(Color.Transparent)
+                            .background(Color.Transparent),
+                        colors = ButtonDefaults.buttonColors( contentColor = Color.White),
+                        border = BorderStroke(1.dp, Color.White),
+                        shape = RoundedCornerShape(0.dp)
                     ) {
                         Text("place an order for $${"%.2f".format(cost)}", fontSize = 12.sp)
                     }
@@ -84,20 +91,20 @@ fun BottomBarForCart(
                             .background(Color.Transparent)
                     ) {
                         IconButton(onClick = { navController.navigate(Marshroutes.menuRoute) }) {
-                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.Black)
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu", tint = Color.White)
                         }
                         IconButton(onClick = { navController.navigate(Marshroutes.basketRoute) }) {
                             Icon(
                                 Icons.Filled.ShoppingCart,
                                 contentDescription = "Cart",
-                                tint = Color.Black
+                                tint = Color.White
                             )
                         }
                         IconButton(onClick = { navController.navigate(Marshroutes.profileRoute) }) {
                             Icon(
                                 Icons.Filled.Person,
                                 contentDescription = "Profile",
-                                tint = Color.Black
+                                tint = Color.White
                             )
                         }
                     }

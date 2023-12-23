@@ -19,13 +19,20 @@ import androidx.core.view.WindowCompat
 private val DarkColorScheme = darkColorScheme(
     primary = Color.Black,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    surface = Color.Black,
+    onSurface = Color.Black,
+    background = Color.Black
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Color.Black,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
+    surface = Color.Black,
+    onSurface = Color.Black,
+    background = Color.Black
+
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -66,6 +73,6 @@ fun FoodDeliveryFireBaseTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }

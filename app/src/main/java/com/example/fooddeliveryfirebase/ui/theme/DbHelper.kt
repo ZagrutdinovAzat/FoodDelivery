@@ -166,22 +166,18 @@ class DbHelper {
         myBasket.child(cUser!!.uid).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val updatedProducts = mutableListOf<Product>()
-
-                // Далее, обработка изменений в корзине и обновление соответствующих данных для списка меню
                 for (product in listData.value) {
                     dataSnapshot.children.find { it.key == product.name }?.let { basketItem ->
-                        // Получаем обновленное количество товаров из корзины
                         val count = basketItem.child("count").getValue(Int::class.java) ?: 0
                         val updatedProduct = product.copy(cValue = count)
                         updatedProducts.add(updatedProduct)
                     } ?: updatedProducts.add(product)
                 }
 
-                listData.value = updatedProducts // Обновляем listData после изменений в корзине
+                listData.value = updatedProducts
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибок
             }
         })
     }
@@ -343,7 +339,6 @@ class DbHelper {
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Обработка ошибок, если не удалось получить данные
-                // Например, вызов callback с пустым списком
             }
         })
     }
