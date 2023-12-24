@@ -84,7 +84,7 @@ fun CurrentOrders(db: DbHelper, navController: NavController) {
                             .fillMaxWidth()
                             .padding(8.dp)
                             .clickable {
-                                navController.navigate("${Marshroutes.orderBasketRoute}/${order.id}")
+                                navController.navigate("${Marshroutes.orderBasketRoute}/${order.id}/${db.cUser!!.uid}")
                             }
                     ) {
                         Column(

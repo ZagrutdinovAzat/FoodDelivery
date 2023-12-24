@@ -51,9 +51,10 @@ object MyNavigation {
                 CurrentOrders(db = db, navController = navController)
             }
 
-            composable(route = "${Marshroutes.orderBasketRoute}/{orderId}") { backStackEntry ->
+            composable(route = "${Marshroutes.orderBasketRoute}/{orderId}/{userId}") { backStackEntry ->
                 val orderId = backStackEntry.arguments?.getString("orderId") ?: ""
-                OrderBasketScreen(db = db, orderId = orderId, navController = navController)
+                val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                OrderBasketScreen(db = db, orderId = orderId, navController = navController, userId)
             }
 
             composable(route = Marshroutes.addDish) {
@@ -64,6 +65,11 @@ object MyNavigation {
             {
                 DeleteDish(db = db)
             }
+
+            composable(route = Marshroutes.ordersForAdmin)
+            {
+                CheckOrdersForAdmin(db = db, navController = navController)
+            }
         }
     }
 }
@@ -73,13 +79,18 @@ object Marshroutes {
     const val registrationRoute = "Registration"
     const val connectingRoute = "Connecting"
     const val menuRoute = "Menu"
-    const val forAdminRoute = "ForAdmin"
     const val basketRoute = "Basket"
     const val orderRoute = "Order"
     const val profileRoute = "Profile"
 
     const val currentOrdersRoute = "CurrentOrders"
     const val orderBasketRoute = "OrderBasket"
+
+    const val forAdminRoute = "ForAdmin"
     const val addDish = "AddNewDish"
     const val deleteDish = "DeleteDish"
+    const val ordersForAdmin = "OrdersForAdmin"
+
+
+
 }

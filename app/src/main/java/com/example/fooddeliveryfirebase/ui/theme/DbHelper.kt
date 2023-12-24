@@ -2,6 +2,7 @@ package com.example.fooddeliveryfirebase.ui.theme
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.MutableLiveData
@@ -171,8 +172,7 @@ class DbHelper {
         }
     }
 
-    fun deleteDishInMenu(dishId: String, context: Context)
-    {
+    fun deleteDishInMenu(dishId: String, context: Context) {
         val menuRef = FirebaseDatabase.getInstance().getReference("Menu")
         val dishRef = menuRef.child(dishId)
 
@@ -327,9 +327,52 @@ class DbHelper {
     }
 
 
-    fun getAllOrdersForAdmin()
-    {
-        myOrders
+    fun getAllOrdersForAdmin(listData: MutableState<List<OrdersForAdmin>>) {
+        myOrders.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val ordersList = mutableListOf<OrdersForAdmin>()
+                for (userSnapshot in dataSnapshot.children) {
+                    // Получаем user_id
+                    val userId = userSnapshot.key
+
+                    // Цикл для перебора всех заказов пользователя
+                    userSnapshot.children.forEach { orderSnapshot ->
+                        val orderId = orderSnapshot.key
+
+                        // Получаем данные каждого заказа
+                        val address = orderSnapshot.child("address").getValue(String::class.java)
+                        //val basket = orderSnapshot.child("basket").getValue()
+                        val estimatedOrderDate =
+                            orderSnapshot.child("estimated order date").getValue(String::class.java)
+                        val orderDate =
+                            orderSnapshot.child("order date").getValue(String::class.java)
+                        val phoneNumber =
+                            orderSnapshot.child("phoneNumber").getValue(String::class.java)
+                        val price = orderSnapshot.child("price").getValue(Double::class.java)
+
+                        val order = OrdersForAdmin(
+                            userId = userId!!,
+                            orderId = orderId!!,
+                            address = address!!,
+                            estimatedOrderDate = estimatedOrderDate!!,
+                            orderDate = orderDate!!,
+                            phoneNumber = phoneNumber!!,
+                            price = price
+                        )
+
+                        ordersList.add(order)
+                        // Делаем что-то с полученными данными (например, сохраняем их в список или обрабатываем)
+                        // ...
+                    }
+                }
+                listData.value = ordersList
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибки, если таковая произошла
+                Log.w("Firebase", "Ошибка при чтении данных", databaseError.toException())
+            }
+        })
     }
 
     fun getAllOrdersForUser(listData: MutableState<List<Order>>) {
@@ -370,8 +413,8 @@ class DbHelper {
         })
     }
 
-    fun getBasketForOrder(orderId: String, listData: MutableState<List<Product>>) {
-        val orderRef = myOrders.child(cUser!!.uid).child(orderId).child("basket")
+    fun getBasketForOrder(orderId: String, listData: MutableState<List<Product>>, userId: String) {
+        val orderRef = myOrders.child(userId).child(orderId).child("basket")
 
         orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {

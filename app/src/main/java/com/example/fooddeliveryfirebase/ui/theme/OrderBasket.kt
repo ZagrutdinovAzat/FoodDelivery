@@ -38,11 +38,11 @@ import androidx.navigation.NavController
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrderBasketScreen(db: DbHelper, orderId: String, navController: NavController) {
+fun OrderBasketScreen(db: DbHelper, orderId: String, navController: NavController, userId: String) {
     val basketResult = remember { mutableStateOf(emptyList<Product>()) }
 
     LaunchedEffect(Unit) {
-        db.getBasketForOrder(orderId, basketResult)
+        db.getBasketForOrder(orderId, basketResult, userId)
     }
 
 
