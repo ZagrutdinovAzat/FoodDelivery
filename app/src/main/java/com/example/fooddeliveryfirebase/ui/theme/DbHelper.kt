@@ -50,7 +50,7 @@ class DbHelper {
         }
     }
 
-    fun addInUser() {
+    private fun addInUser() {
         userRef.child(cUser!!.uid).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -65,6 +65,7 @@ class DbHelper {
             }
         })
     }
+
 
     fun logIn(
         login: String,
@@ -161,13 +162,27 @@ class DbHelper {
             }
     }
 
-    fun addDishInFirebase(name: String, description: String, price: String, context: Context) {
+    fun addDishInMenu(name: String, description: String, price: String, context: Context) {
         if (name == "" || description == "" || price.toDoubleOrNull() == null) {
             makeToast(context = context, "Fill all fields")
         } else {
             val dish = Product(name = name, description = description, price = price.toDouble())
             myMenu.child(name).setValue(dish)
         }
+    }
+
+    fun deleteDishInMenu(dishId: String, context: Context)
+    {
+        val menuRef = FirebaseDatabase.getInstance().getReference("Menu")
+        val dishRef = menuRef.child(dishId)
+
+        dishRef.removeValue()
+            .addOnSuccessListener {
+                makeToast(context, "The deletion was successful")
+            }
+            .addOnFailureListener { error ->
+                println("Error deleting a record: $error")
+            }
     }
 
     fun addInBasket(name: String, price: Double?, description: String?, c: Int) {
@@ -311,6 +326,11 @@ class DbHelper {
         }
     }
 
+
+    fun getAllOrdersForAdmin()
+    {
+        myOrders
+    }
 
     fun getAllOrdersForUser(listData: MutableState<List<Order>>) {
         val userOrdersRef = myOrders.child(cUser!!.uid)

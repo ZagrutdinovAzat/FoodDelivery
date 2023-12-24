@@ -8,14 +8,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -24,13 +35,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fooddeliveryfirebase.CustomTextField
 import com.example.fooddeliveryfirebase.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
@@ -39,9 +56,13 @@ fun LoginScreen(
     var login by rememberSaveable {
         mutableStateOf("")
     }
-    var password by rememberSaveable {
-        mutableStateOf("")
-    }
+//    var password by rememberSaveable {
+//        mutableStateOf("")
+//    }
+
+    var password by remember { mutableStateOf(TextFieldValue("")) }
+    var passwordVisible by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
 
 
@@ -66,20 +87,51 @@ fun LoginScreen(
 
         CustomTextField(value = login, onValueChange = { login = it }, label = "Login")
 
-        CustomTextField(
+        TextField(
             value = password,
             onValueChange = { password = it },
-            label = "Password"
+            label = { Text("Password") },
+            singleLine = true,
+            placeholder = { Text("Password") },
+            modifier = Modifier.padding(16.dp),
+            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+            shape = RoundedCornerShape(8.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                cursorColor = Color.Black,
+                focusedIndicatorColor = Color.Black,
+                unfocusedIndicatorColor = Color.Gray,
+                containerColor = Color.LightGray,
+            ),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else Icons.Filled.VisibilityOff
+
+                val description = if (passwordVisible) "Hide password" else "Show password"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, description)
+                }
+            }
         )
+
+//        CustomTextField(
+//            value = password,
+//            onValueChange = { password = it },
+//            label = "Password"
+//        )
         Button(
             onClick = {
-                if (login == "" || password == "") {
+                if (login == "" || password.text == "") {
                     makeToast(context = context, text = "Fill in all the fields")
                 } else {
-                    db.logIn(login, password, context, navController) { success ->
+                    db.logIn(login, password.text, context, navController) { success ->
                         if (success) {
                             login = ""
-                            password = ""
+                            //password.text = ""
                         }
                     }
                 }
@@ -97,7 +149,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 login = ""
-                password = ""
+                //password = ""
                 navController.navigate(Marshroutes.registrationRoute)
             },
             colors = ButtonDefaults.buttonColors(

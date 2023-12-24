@@ -29,12 +29,9 @@ fun ConnectingScreen(navController: NavController, db: DbHelper) {
         if (userEmail != null)
             Text(text = "You are logged in: $userEmail", color = Color.White)
 
-        ResumeButton(navController = navController)
+        ResumeButton(navController = navController, db = db)
 
         LogOutButton(db = db, navController = navController)
-
-        if (db.userRole == 2)
-            ForAdminButton(navController = navController)
 
     }
 }
@@ -57,10 +54,13 @@ fun LogOutButton(db: DbHelper, navController: NavController) {
 }
 
 @Composable
-fun ResumeButton(navController: NavController) {
+fun ResumeButton(navController: NavController, db: DbHelper) {
     Button(
         onClick = {
-            navController.navigate(Marshroutes.menuRoute)
+            if (db.userRole == 0)
+                navController.navigate(Marshroutes.menuRoute)
+            else if (db.userRole == 2)
+                navController.navigate(Marshroutes.forAdminRoute)
         }, shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
