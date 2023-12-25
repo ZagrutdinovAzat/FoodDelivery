@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -302,7 +303,8 @@ class DbHelper {
                     .format(LocalDateTime.now()),
                 "estimated order date" to date,
                 "price" to price,
-                "basket" to serializedBasket
+                "basket" to serializedBasket,
+                "status" to 0
             )
 
             orderRef.setValue(orderData).addOnSuccessListener {
@@ -324,6 +326,93 @@ class DbHelper {
             2 -> makeToast(context = cont, text = "Cart is empty")
             3 -> makeToast(context = cont, text = "Error when creating an order")
         }
+    }
+
+    fun addInCompletedOrders(
+        userId: String,
+        orderId: String,
+        listData: MutableState<List<OrdersForAdmin>>
+    ) {
+        val database = Firebase.database
+        val ordersRef = myOrders.child(userId).child(orderId)
+        val completedOrdersRef =
+            database.getReference("CompletedOrders").child(userId).child(orderId)
+
+        ordersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val address = dataSnapshot.child("address").getValue(String::class.java)
+                val estimatedOrderDate =
+                    dataSnapshot.child("estimated order date").getValue(String::class.java)
+                val orderDate = dataSnapshot.child("order date").getValue(String::class.java)
+                val phoneNumber = dataSnapshot.child("phoneNumber").getValue(String::class.java)
+                val price = dataSnapshot.child("price").getValue(Double::class.java)
+                val status = dataSnapshot.child("status").getValue(Double::class.java)
+
+                val basket: MutableList<Product> = mutableListOf()
+                val basketSnapshot = dataSnapshot.child("basket")
+                basketSnapshot.children.forEach { dishSnapshot ->
+                    val dishId = dishSnapshot.key
+                    val cValue = dishSnapshot.child("cValue").getValue(Double::class.java)!!.toInt()
+                    val description = dishSnapshot.child("description").getValue(String::class.java)
+                    val dishPrice = dishSnapshot.child("price").getValue(Double::class.java)!!
+
+                    val dish = Product(
+                        name = dishId.toString(),
+                        cValue = cValue,
+                        description = description.toString(),
+                        price = dishPrice
+                    )
+                    basket.add(dish)
+                }
+
+                val orderDateTime =
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy:MM:dd:HH:mm"))
+
+                val serializedBasket = basket.associate { product ->
+                    product.name to mapOf(
+                        "price" to product.price,
+                        "cValue" to product.cValue,
+                        "description" to product.description
+                    )
+                }
+
+                val orderData = hashMapOf(
+                    "address" to address,
+                    "phoneNumber" to phoneNumber,
+                    "order date" to orderDate,
+                    "estimated order date" to estimatedOrderDate,
+                    "delivery date" to orderDateTime,
+                    "price" to price,
+                    "basket" to serializedBasket,
+                    "status" to status
+                )
+
+                completedOrdersRef.setValue(orderData).addOnSuccessListener {
+                    val ref = myOrders.child(userId).child(orderId)
+
+                    ref.removeValue()
+                        .addOnSuccessListener {
+
+                            // shit
+                            getAllOrdersForAdmin(listData)
+
+                            //
+
+                        }
+                        .addOnFailureListener { error ->
+                            println("Ошибка при удалении заказа: $error")
+                        }
+                }.addOnFailureListener {
+                    // Обработка ошибки, если таковая произошла
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибки, если таковая произошла
+                Log.w("Firebase", "Ошибка при чтении данных", databaseError.toException())
+            }
+        })
     }
 
 
@@ -375,6 +464,23 @@ class DbHelper {
         })
     }
 
+    fun updateStatusOrderAdmin(userId: String, orderId: String, status: Int) {
+
+        val ordersRef = myOrders.child(userId).child(orderId)
+
+// Обновление значения "status" в базе данных Firebase
+        ordersRef.child("status").setValue(status)
+            .addOnSuccessListener {
+                // Успешное обновление статуса
+                println("Статус успешно обновлен в базе данных")
+            }
+            .addOnFailureListener { error ->
+                // Обработка ошибки при обновлении
+                println("Ошибка при обновлении статуса: $error")
+            }
+
+    }
+
     fun getAllOrdersForUser(listData: MutableState<List<Order>>) {
         val userOrdersRef = myOrders.child(cUser!!.uid)
 
@@ -391,6 +497,7 @@ class DbHelper {
                     val phoneNumber =
                         orderSnapshot.child("phoneNumber").getValue(String::class.java)
                     val totalPrice = orderSnapshot.child("price").getValue(Double::class.java)
+                    val status = orderSnapshot.child("status").getValue(Double::class.java)
 
                     if (orderId != null && address != null && estimatedOrderDate != null && orderDate != null && phoneNumber != null && totalPrice != null) {
                         val order = Order(
@@ -399,7 +506,8 @@ class DbHelper {
                             estimatedOrderDate = estimatedOrderDate,
                             orderDate = orderDate,
                             phoneNumber = phoneNumber,
-                            price = totalPrice
+                            price = totalPrice,
+                            status = status
                         )
                         ordersList.add(order)
                     }

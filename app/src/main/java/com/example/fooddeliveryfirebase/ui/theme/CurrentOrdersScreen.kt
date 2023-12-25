@@ -41,7 +41,8 @@ class Order(
     val estimatedOrderDate: String,
     val orderDate: String,
     val phoneNumber: String,
-    val price: Double?
+    val price: Double?,
+    val status: Double?
 )
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -102,6 +103,13 @@ fun CurrentOrders(db: DbHelper, navController: NavController) {
                             Text(text = "Estimated Order Date: ${order.estimatedOrderDate}")
                             Text(text = "Order Date: ${order.orderDate}")
                             Text(text = "Total Price: ${order.price}")
+                            if (order.status?.toInt() == 0) {
+                                Text(text = "Status: Verification by the administrator")
+                            } else if (order.status?.toInt() == 1) {
+                                Text(text = "Status: The administrator accepted the order, it was handed over to the courier")
+                            } else if (order.status?.toInt() == -1) {
+                                Text(text = "Status: The order has been cancelled")
+                            }
                         }
                     }
                 }

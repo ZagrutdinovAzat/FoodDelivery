@@ -248,7 +248,13 @@ fun CheckOrdersForAdmin(db: DbHelper, navController: NavController) {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Button(
-                            onClick = { /*todo*/ },
+                            onClick = {
+                                db.updateStatusOrderAdmin(
+                                    userId = order.userId,
+                                    orderId = order.orderId,
+                                    1
+                                )
+                            },
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                             modifier = Modifier.width(150.dp)
@@ -257,7 +263,20 @@ fun CheckOrdersForAdmin(db: DbHelper, navController: NavController) {
                         }
                         Spacer(modifier = Modifier.width(5.dp))
                         Button(
-                            onClick = { /*todo*/ },
+                            onClick = {
+                                db.updateStatusOrderAdmin(
+                                    userId = order.userId,
+                                    orderId = order.orderId,
+                                    -1
+                                )
+                                db.addInCompletedOrders(
+                                    userId = order.userId,
+                                    orderId = order.orderId,
+                                    listData = listData
+                                )
+
+                                    //db.getAllOrdersForAdmin(listData)
+                            },
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                             modifier = Modifier.width(150.dp)
