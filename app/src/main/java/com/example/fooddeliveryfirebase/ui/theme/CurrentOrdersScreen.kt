@@ -118,30 +118,3 @@ fun CurrentOrders(db: DbHelper, navController: NavController) {
     )
 }
 
-
-//@Composable
-//fun OrderItem(order: Order) {
-//    Card(
-//        shape = RoundedCornerShape(8.dp),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp)
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .padding(16.dp)
-//        ) {
-//            Text(
-//                text = "Order ID: ${order.id}",
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 16.sp
-//            )
-//            Spacer(modifier = Modifier.height(4.dp))
-//            Text(text = "Address: ${order.address}")
-//            Text(text = "Phone Number: ${order.phoneNumber}")
-//            Text(text = "Estimated Order Date: ${order.estimatedOrderDate}")
-//            Text(text = "Order Date: ${order.orderDate}")
-//            Text(text = "Total Price: ${order.price}")
-//        }
-//    }
-//}

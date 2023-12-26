@@ -70,6 +70,11 @@ object MyNavigation {
             {
                 CheckOrdersForAdmin(db = db, navController = navController)
             }
+
+            composable(route = Marshroutes.completedOrders)
+            {
+                CompletedOrdersScreen(db = db, navController = navController)
+            }
         }
     }
 }
@@ -92,5 +97,5 @@ object Marshroutes {
     const val ordersForAdmin = "OrdersForAdmin"
 
 
-
+    const val completedOrders = "CompletedOrders"
 }

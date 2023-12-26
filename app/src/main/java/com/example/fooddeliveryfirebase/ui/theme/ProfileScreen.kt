@@ -1,19 +1,35 @@
 package com.example.fooddeliveryfirebase.ui.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -21,58 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-//@Composable
-//fun ProfileScreen(navController: NavController, db: DbHelper) {
-//    Column(
-//        modifier = Modifier
-//            .padding(16.dp)
-//            .fillMaxSize()
-//    ) {
-//        Text(
-//            text = "User Profile",
-//            fontSize = 24.sp,
-//            fontWeight = FontWeight.Bold,
-//            modifier = Modifier.padding(bottom = 16.dp)
-//        )
-//        Text(
-//            text = "Logged in as: ${db.cUser!!.email}",
-//            fontSize = 18.sp,
-//            modifier = Modifier.padding(bottom = 8.dp)
-//        )
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Button(
-//            onClick = { navController.navigate(Marshroutes.currentOrdersRoute) },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 8.dp)
-//        ) {
-//            Text("Current Orders")
-//        }
-//
-//        Button(
-//            onClick = { /* TODO: Handle Completed Orders */ },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 8.dp)
-//        ) {
-//            Text("Completed Orders")
-//        }
-//        Button(
-//            onClick = { db.logOut(navController) },
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(vertical = 8.dp)
-//        ) {
-//            Text("Logout")
-//        }
-//    }
-//}
-
 
 @Composable
 fun ProfileScreen(navController: NavController, db: DbHelper) {
-
-
     BottomBarForMenu(
         navController = navController,
         function = { ProfileColumn(db = db, navController = navController) })
@@ -122,7 +89,7 @@ fun ProfileColumn(db: DbHelper, navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
         Button(
-            onClick = { /* TODO: Handle Completed Orders */ },
+            onClick = { navController.navigate(Marshroutes.completedOrders) },
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent),
@@ -145,4 +112,137 @@ fun ProfileColumn(db: DbHelper, navController: NavController) {
             Text("Logout")
         }
     }
+}
+
+
+class CompletedOrder(
+    val id: String,
+    val address: String,
+    val estimatedOrderDate: String,
+    val orderDate: String,
+    val deliveryDate: String,
+    val phoneNumber: String,
+    val price: Double?,
+    val status: Double?
+)
+
+
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompletedOrdersScreen(db: DbHelper, navController: NavController) {
+    val listData = remember { mutableStateOf(emptyList<CompletedOrder>()) }
+
+    LaunchedEffect(Unit) {
+        db.getCompletedOrders(listData)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Back", color = Color.White) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+        },
+        content = {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .padding(top = 40.dp),
+                contentPadding = PaddingValues(16.dp),
+            ) {
+                items(listData.value) { order ->
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(2.dp, Color.White),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                /*navController.navigate("${Marshroutes.orderBasketRoute}/${order.id}/${db.cUser!!.uid}")*/
+                            }
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = "Order ID: ${order.id}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "Address: ${order.address}")
+                            Text(text = "Phone Number: ${order.phoneNumber}")
+                            Text(text = "Estimated Order Date: ${order.estimatedOrderDate}")
+                            Text(text = "Order Date: ${order.orderDate}")
+                            Text(text = "Delivery Date: ${order.deliveryDate}")
+                            Text(text = "Total Price: ${order.price}")
+                            if (order.status?.toInt() == 0) {
+                                Text(text = "Status: Verification by the administrator")
+                            } else if (order.status?.toInt() == 1) {
+                                Text(text = "Status: The administrator accepted the order, it was handed over to the courier")
+                            } else if (order.status?.toInt() == -1) {
+                                Text(text = "Status: The order has been cancelled")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
+
+
+
+//    LazyColumn {
+//        items(listData.value) { order ->
+//            Card(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(8.dp),
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(16.dp)
+//                ) {
+//                    Text(text = "Order ID: ${order.id}", fontWeight = FontWeight.Bold)
+//                    Text(text = "Address: ${order.address}")
+//                    Text(text = "Estimated Order Date: ${order.estimatedOrderDate}")
+//                    Text(text = "Order Date: ${order.orderDate}")
+//                    Text(text = "Delivery Date: ${order.deliveryDate}")
+//                    Text(text = "Phone Number: ${order.phoneNumber}")
+//                    Text(text = "Price: ${order.price ?: "N/A"}")
+//                    Text(text = "Status: ${order.status ?: "N/A"}")
+//                }
+//            }
+//        }
+//    }
+
+
+
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.Transparent)
+//            .padding(top = 40.dp),
+//        contentPadding = PaddingValues(16.dp),
+//    ) {
+//        items(listData.value) { order ->
+//
+//        }
+//    }
+
+
+
 }

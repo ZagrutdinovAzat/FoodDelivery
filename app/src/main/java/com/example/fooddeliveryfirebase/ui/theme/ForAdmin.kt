@@ -135,17 +135,17 @@ fun AddNewDish(imgHandler: MainActivity.Img, db: DbHelper) {
             }
         }, label = "price")
 
-        Button(
-            onClick = {
-                imgHandler.getImage()
-            }, shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray
-            ),
-            modifier = Modifier.width(150.dp)
-        ) {
-            Text(text = "choose image", color = Color.Black)
-        }
+//        Button(
+//            onClick = {
+//                imgHandler.getImage()
+//            }, shape = RoundedCornerShape(8.dp),
+//            colors = ButtonDefaults.buttonColors(
+//                containerColor = Color.LightGray
+//            ),
+//            modifier = Modifier.width(150.dp)
+//        ) {
+//            Text(text = "choose image", color = Color.Black)
+//        }
 
 
         Button(
@@ -155,12 +155,17 @@ fun AddNewDish(imgHandler: MainActivity.Img, db: DbHelper) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.LightGray
             ),
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(150.dp),
         ) {
-            Text(text = "add to the menu", color = Color.Black)
+            Text(
+                text = "add to the menu",
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
+
         }
 
-        Text(text = imgHandler.myImg.value)
+        //Text(text = imgHandler.myImg.value)
     }
 }
 
@@ -275,7 +280,6 @@ fun CheckOrdersForAdmin(db: DbHelper, navController: NavController) {
                                     listData = listData
                                 )
 
-                                    //db.getAllOrdersForAdmin(listData)
                             },
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),

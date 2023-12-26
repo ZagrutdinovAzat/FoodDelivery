@@ -38,6 +38,10 @@ class DbHelper {
 
     private val myOrders: DatabaseReference = FirebaseDatabase.getInstance().getReference("Orders")
 
+
+    private val completedOrderRef: DatabaseReference =
+        FirebaseDatabase.getInstance().getReference("CompletedOrders")
+
     val userRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Users")
 
 
@@ -415,20 +419,60 @@ class DbHelper {
         })
     }
 
+    fun getCompletedOrders(listData: MutableState<List<CompletedOrder>>) {
+        val completedOrdersLink = completedOrderRef.child(cUser!!.uid)
+
+        completedOrdersLink.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val completedOrdersList: MutableList<CompletedOrder> = mutableListOf()
+                for (orderSnapshot in dataSnapshot.children) {
+                    val orderId = orderSnapshot.key
+                    val address = orderSnapshot.child("address").getValue(String::class.java)
+                    val estimatedOrderDate =
+                        orderSnapshot.child("estimated order date").getValue(String::class.java)
+                    val orderDate = orderSnapshot.child("order date").getValue(String::class.java)
+                    val deliveryDate =
+                        orderSnapshot.child("delivery date").getValue(String::class.java)
+                    val phoneNumber =
+                        orderSnapshot.child("phoneNumber").getValue(String::class.java)
+                    val price = orderSnapshot.child("price").getValue(Double::class.java)
+                    val status = orderSnapshot.child("status").getValue(Double::class.java)
+
+                    val order = CompletedOrder(
+                        id = orderId.toString(),
+                        address = address!!,
+                        estimatedOrderDate = estimatedOrderDate!!,
+                        orderDate = orderDate!!,
+                        deliveryDate = deliveryDate!!,
+                        phoneNumber = phoneNumber!!,
+                        price = price,
+                        status = status!!,
+                    )
+                    completedOrdersList.add(order)
+                }
+
+                listData.value = completedOrdersList
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Обработка ошибки, если она произошла
+                Log.w("Firebase", "Ошибка при чтении данных", databaseError.toException())
+            }
+        })
+    }
+
 
     fun getAllOrdersForAdmin(listData: MutableState<List<OrdersForAdmin>>) {
         myOrders.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val ordersList = mutableListOf<OrdersForAdmin>()
                 for (userSnapshot in dataSnapshot.children) {
-                    // Получаем user_id
                     val userId = userSnapshot.key
 
-                    // Цикл для перебора всех заказов пользователя
                     userSnapshot.children.forEach { orderSnapshot ->
                         val orderId = orderSnapshot.key
 
-                        // Получаем данные каждого заказа
                         val address = orderSnapshot.child("address").getValue(String::class.java)
                         //val basket = orderSnapshot.child("basket").getValue()
                         val estimatedOrderDate =
@@ -450,15 +494,12 @@ class DbHelper {
                         )
 
                         ordersList.add(order)
-                        // Делаем что-то с полученными данными (например, сохраняем их в список или обрабатываем)
-                        // ...
                     }
                 }
                 listData.value = ordersList
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибки, если таковая произошла
                 Log.w("Firebase", "Ошибка при чтении данных", databaseError.toException())
             }
         })
@@ -468,14 +509,11 @@ class DbHelper {
 
         val ordersRef = myOrders.child(userId).child(orderId)
 
-// Обновление значения "status" в базе данных Firebase
         ordersRef.child("status").setValue(status)
             .addOnSuccessListener {
-                // Успешное обновление статуса
                 println("Статус успешно обновлен в базе данных")
             }
             .addOnFailureListener { error ->
-                // Обработка ошибки при обновлении
                 println("Ошибка при обновлении статуса: $error")
             }
 
@@ -516,7 +554,6 @@ class DbHelper {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибок, если не удалось получить данные
             }
         })
     }
@@ -546,7 +583,6 @@ class DbHelper {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Обработка ошибок, если не удалось получить данные
             }
         })
     }

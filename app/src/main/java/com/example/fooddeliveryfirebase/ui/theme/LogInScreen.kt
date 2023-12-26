@@ -56,10 +56,6 @@ fun LoginScreen(
     var login by rememberSaveable {
         mutableStateOf("")
     }
-//    var password by rememberSaveable {
-//        mutableStateOf("")
-//    }
-
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -117,12 +113,6 @@ fun LoginScreen(
                 }
             }
         )
-
-//        CustomTextField(
-//            value = password,
-//            onValueChange = { password = it },
-//            label = "Password"
-//        )
         Button(
             onClick = {
                 if (login == "" || password.text == "") {
@@ -131,7 +121,6 @@ fun LoginScreen(
                     db.logIn(login, password.text, context, navController) { success ->
                         if (success) {
                             login = ""
-                            //password.text = ""
                         }
                     }
                 }
@@ -149,7 +138,6 @@ fun LoginScreen(
         Button(
             onClick = {
                 login = ""
-                //password = ""
                 navController.navigate(Marshroutes.registrationRoute)
             },
             colors = ButtonDefaults.buttonColors(
